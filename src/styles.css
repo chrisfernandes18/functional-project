@@ -1,0 +1,18 @@
+td {
+  background-color: tan;
+  text-align: center;
+}
+
+td.noPiece {
+  background-color: saddlebrown;
+}
+
+svg.redPiece {
+  fill: red;
+  stroke: white;
+}
+
+svg.blackPiece {
+  fill: black;
+  stroke: white;
+}

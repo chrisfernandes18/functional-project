@@ -13,7 +13,7 @@ import Structs exposing (..)
 
 
 
-{- Helper Functions -}
+{-------------------------- Helper Functions --------------------------}
 
 
 distancePL : PhysicalLoc -> PhysicalLoc -> Float
@@ -315,7 +315,7 @@ setCurrentTile c ll =
 
 
 
-{- Exposed Functions -}
+{------------------------- Exposed Functions -------------------------}
 
 
 logicalToPhysical : LogicalLoc -> BoardSpec -> PhysicalLoc
@@ -488,4 +488,4 @@ movePiece c (LL newRow newCol) t =
 testCheckers : Checkers
 testCheckers =
     -- test game
-    C (Board (newBoard 8) (BS 20 7 10)) (Human "Christian" B) (Human "Angela" R) B 0 Nothing
+    C (Board (newBoard 8) (BS 70 30 10)) (Human "Christian" B) (Human "Angela" R) B 0 Nothing

@@ -12,6 +12,19 @@
             var app = Elm.Render.init({
                 node: document.getElementById('elm')
             });
+            
+            function boardOffset() {
+                const board = document.getElementById('checkers').getBoundingClientRect();
+                var x = board.x;
+                const y = board.y;
+                console.log(x, typeof y);
+                return x;
+            };
+             
+            app.ports.requestBoardOffset.subscribe(function() {
+                var res = boardOffset();
+                app.ports.recieveBoardOffset.send(res);
+            });
         </script>
     </body>
 </html>

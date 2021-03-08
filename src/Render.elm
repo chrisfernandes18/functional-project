@@ -1,4 +1,4 @@
-module Render exposing (main)
+port module Render exposing (main)
 
 -- Imports -----------------------------------------------------------
 
@@ -10,6 +10,7 @@ import Html exposing (Html)
 import Html.Attributes as HAttrs
 import Json.Decode as Decode
 import Logic exposing (..)
+import String exposing (toInt)
 import Structs exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs
@@ -30,10 +31,21 @@ type Model
 type Msg
     = NoClick
     | Click Point
+    | Offset Float
 
 
 type alias Flags =
     ()
+
+
+
+{--------------------------- Port Functions ---------------------------}
+
+
+port recieveBoardOffset : (Float -> msg) -> Sub msg
+
+
+port requestBoardOffset : () -> Cmd msg
 
 
 
@@ -61,7 +73,7 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init () =
-    ( initModel, Cmd.none )
+    ( initModel, requestBoardOffset () )
 
 
 initModel : Model
@@ -165,7 +177,7 @@ boardToHTML b =
                 arrayLst =
                     Array.toList (Array.map toTr (Array.map Array.toList convertedRows))
             in
-            Html.table [ HAttrs.style "margin" "auto", HAttrs.class "checkers" ] arrayLst
+            Html.table [ HAttrs.style "margin" "auto", HAttrs.id "checkers" ] arrayLst
 
 
 view : Model -> Html Msg
@@ -197,15 +209,21 @@ update msg model =
         ( M (C (Board b bs) p1 p2 moves cp ct) _, Click p ) ->
             ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
 
+        ( M (C (Board b (BS cs pr ms)) p1 p2 moves cp ct) p, Offset x ) ->
+            ( M (C (Board b (BS cs pr (round x))) p1 p2 moves cp ct) p, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Browser.Events.onClick
-        (Decode.map
-            (\point -> Click point)
-            (Decode.map2
-                (\x y -> { x = x, y = y })
-                (Decode.field "clientX" Decode.int)
-                (Decode.field "clientY" Decode.int)
+    Sub.batch
+        [ Browser.Events.onClick
+            (Decode.map
+                (\point -> Click point)
+                (Decode.map2
+                    (\x y -> { x = x, y = y })
+                    (Decode.field "clientX" Decode.int)
+                    (Decode.field "clientY" Decode.int)
+                )
             )
-        )
+        , recieveBoardOffset Offset
+        ]

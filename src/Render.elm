@@ -1,10 +1,9 @@
-module Render exposing (..)
+module Render exposing (main)
 
 -- Imports -----------------------------------------------------------
 
 import Array
 import Browser
-import Browser.Dom
 import Browser.Events
 import Debug
 import Html exposing (Html)
@@ -14,7 +13,6 @@ import Logic exposing (..)
 import Structs exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs
-import Task
 
 
 
@@ -74,7 +72,7 @@ initModel =
 boardToHTML : Board -> Html Msg
 boardToHTML b =
     case b of
-        Board arr (BS cs pr ms) ->
+        Board arr (BS cs pr _) ->
             let
                 hheight =
                     HAttrs.style "height" (Debug.toString cs ++ "px")
@@ -180,23 +178,13 @@ view model =
 
                 pointStr =
                     Debug.toString p
-
-                task =
-                    case Task.attempt (\element -> element) (Browser.Dom.getElement "checkers") of
-                        res ->
-                            case res of
-                                Ok elem ->
-                                    elem
-
-                                Err str ->
-                                    Html.text str
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
                 [ Html.text boardStr
                 , Html.div
                     []
-                    [ boardToHTML (Board b bs), Html.text pointStr, task ]
+                    [ boardToHTML (Board b bs), Html.text pointStr ]
                 ]
 
 
@@ -211,7 +199,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Browser.Events.onClick
         (Decode.map
             (\point -> Click point)

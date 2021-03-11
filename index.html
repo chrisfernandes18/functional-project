@@ -16,9 +16,9 @@
             function boardOffset() {
                 const board = document.getElementById('checkers').getBoundingClientRect();
                 var x = board.x;
-                const y = board.y;
-                console.log(x, typeof y);
-                return x;
+                var y = board.y;
+                console.log([x, y]);
+                return [x, y];
             };
              
             app.ports.requestBoardOffset.subscribe(function() {

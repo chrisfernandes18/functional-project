@@ -13,7 +13,7 @@ type LogicalLoc {- location internally row col -}
 
 
 type PhysicalLoc {- location in GUI x y -}
-    = PL Int Int
+    = PL Float Float
 
 
 type Move {- if a piece is moving positively or negatively -}
@@ -28,19 +28,23 @@ type Tile
 
 
 type alias CellSize {- size of each square on board -} =
-    Int
+    Float
 
 
 type alias PieceRadius {- radius of checkers piece -} =
-    Int
+    Float
 
 
-type alias MarginSize {- amount of margin around board -} =
-    Int
+type alias MarginSizeX {- amount of margin around board -} =
+    Float
+
+
+type alias MarginSizeY {- amount of margin around board -} =
+    Float
 
 
 type BoardSpec
-    = BS CellSize PieceRadius MarginSize
+    = BS CellSize PieceRadius MarginSizeX MarginSizeY
 
 
 type Board

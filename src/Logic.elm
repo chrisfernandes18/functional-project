@@ -21,7 +21,7 @@ distancePL p1 p2 =
     -- checks the distance between two physical locations
     case ( p1, p2 ) of
         ( PL x1 y1, PL x2 y2 ) ->
-            sqrt (toFloat ((x1 - x2) ^ 2 + (y1 - y2) ^ 2))
+            sqrt ((x1 - x2) ^ 2 + (y1 - y2) ^ 2)
 
 
 withinPiece : PhysicalLoc -> PhysicalLoc -> BoardSpec -> Bool
@@ -29,8 +29,8 @@ withinPiece p1 p2 bs =
     -- checks if two physical locations are indeed the same checker
     -- piece
     case bs of
-        BS _ pr _ ->
-            distancePL p1 p2 <= toFloat pr
+        BS _ pr _ _ ->
+            distancePL p1 p2 <= pr
 
 
 newTile : Maybe Color -> Int -> Int -> Tile
@@ -323,31 +323,21 @@ logicalToPhysical ll bs =
     -- Converts the location within data structures to
     -- where it should be in GUI
     case ( ll, bs ) of
-        ( LL col row, BS cs _ ms ) ->
+        ( LL row col, BS cs _ mx my ) ->
             if not (withinBounds ll) then
                 Debug.todo "logicalToPhysical: spot not on board"
 
             else
-                PL (ms + (cs * col)) (ms + (cs * row))
+                PL (my + (cs * toFloat col)) (mx + (cs * toFloat row))
 
 
-physicalToLogical : PhysicalLoc -> BoardSpec -> Maybe LogicalLoc
+physicalToLogical : PhysicalLoc -> BoardSpec -> LogicalLoc
 physicalToLogical pl bs =
     -- Converts the location on GUI to where it should be within
     -- data structures
     case ( pl, bs ) of
-        ( PL x1 x2, BS cs pr ms ) ->
-            let
-                convertToLogical p =
-                    case p of
-                        PL x y ->
-                            LL ((x - ms) // cs) ((y - ms) // cs)
-            in
-            if withinPiece pl (logicalToPhysical (convertToLogical pl) bs) bs then
-                Just (convertToLogical pl)
-
-            else
-                Nothing
+        ( PL x y, BS cs _ mx my ) ->
+            LL (round ((y - my) / cs)) (round ((x - mx) / cs))
 
 
 boardRef : Checkers -> LogicalLoc -> Tile
@@ -488,4 +478,4 @@ movePiece c (LL newRow newCol) t =
 testCheckers : Checkers
 testCheckers =
     -- test game
-    C (Board (newBoard 8) (BS 70 30 10)) (Human "Christian" B) (Human "Angela" R) B 0 Nothing
+    C (Board (newBoard 8) (BS 70 30 10 10)) (Human "Christian" B) (Human "Angela" R) B 0 Nothing

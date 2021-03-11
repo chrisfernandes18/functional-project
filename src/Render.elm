@@ -21,7 +21,7 @@ import Svg.Attributes as SAttrs
 
 
 type alias Point =
-    { x : Int, y : Int }
+    { x : Float, y : Float }
 
 
 type Model
@@ -31,7 +31,7 @@ type Model
 type Msg
     = NoClick
     | Click Point
-    | Offset Float
+    | Offset (List Float)
 
 
 type alias Flags =
@@ -42,7 +42,7 @@ type alias Flags =
 {--------------------------- Port Functions ---------------------------}
 
 
-port recieveBoardOffset : (Float -> msg) -> Sub msg
+port recieveBoardOffset : (List Float -> msg) -> Sub msg
 
 
 port requestBoardOffset : () -> Cmd msg
@@ -84,7 +84,7 @@ initModel =
 boardToHTML : Board -> Html Msg
 boardToHTML b =
     case b of
-        Board arr (BS cs pr _) ->
+        Board arr (BS cs pr _ _) ->
             let
                 hheight =
                     HAttrs.style "height" (Debug.toString cs ++ "px")
@@ -134,11 +134,11 @@ boardToHTML b =
                                             Html.td
                                                 [ hheight, hwidth ]
                                                 [ svg
-                                                    [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromInt cs ++ " " ++ String.fromInt cs), SAttrs.class "blackPiece" ]
+                                                    [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPiece" ]
                                                     [ circle
-                                                        [ SAttrs.cx (String.fromInt (cs // 2))
-                                                        , SAttrs.cy (String.fromInt (cs // 2))
-                                                        , SAttrs.r (String.fromInt pr)
+                                                        [ SAttrs.cx (String.fromFloat (cs / 2.0))
+                                                        , SAttrs.cy (String.fromFloat (cs / 2.0))
+                                                        , SAttrs.r (String.fromFloat pr)
                                                         ]
                                                         []
                                                     ]
@@ -160,11 +160,11 @@ boardToHTML b =
                                             Html.td
                                                 [ hheight, hwidth ]
                                                 [ svg
-                                                    [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromInt cs ++ " " ++ String.fromInt cs), SAttrs.class "redPiece" ]
+                                                    [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPiece" ]
                                                     [ circle
-                                                        [ SAttrs.cx (String.fromInt (cs // 2))
-                                                        , SAttrs.cy (String.fromInt (cs // 2))
-                                                        , SAttrs.r (String.fromInt pr)
+                                                        [ SAttrs.cx (String.fromFloat (cs / 2))
+                                                        , SAttrs.cy (String.fromFloat (cs / 2))
+                                                        , SAttrs.r (String.fromFloat pr)
                                                         ]
                                                         []
                                                     ]
@@ -190,13 +190,19 @@ view model =
 
                 pointStr =
                     Debug.toString p
+
+                refStr =
+                    Debug.toString (boardRef (C (Board b bs) p1 p2 moves cp ct) (physicalToLogical (PL p.x p.y) bs))
+
+                logicalStr =
+                    Debug.toString (physicalToLogical (PL p.x p.y) bs)
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
                 [ Html.text boardStr
                 , Html.div
                     []
-                    [ boardToHTML (Board b bs), Html.text pointStr ]
+                    [ boardToHTML (Board b bs), Html.text pointStr, Html.text logicalStr, Html.text refStr ]
                 ]
 
 
@@ -209,8 +215,11 @@ update msg model =
         ( M (C (Board b bs) p1 p2 moves cp ct) _, Click p ) ->
             ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
 
-        ( M (C (Board b (BS cs pr ms)) p1 p2 moves cp ct) p, Offset x ) ->
-            ( M (C (Board b (BS cs pr (round x))) p1 p2 moves cp ct) p, Cmd.none )
+        ( M (C (Board b (BS cs pr _ _)) p1 p2 moves cp ct) p, Offset (x :: y :: _) ) ->
+            ( M (C (Board b (BS cs pr x y)) p1 p2 moves cp ct) p, Cmd.none )
+
+        ( M (C (Board b bs) p1 p2 moves cp ct) p, _ ) ->
+            ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -221,8 +230,8 @@ subscriptions _ =
                 (\point -> Click point)
                 (Decode.map2
                     (\x y -> { x = x, y = y })
-                    (Decode.field "clientX" Decode.int)
-                    (Decode.field "clientY" Decode.int)
+                    (Decode.field "clientX" Decode.float)
+                    (Decode.field "clientY" Decode.float)
                 )
             )
         , recieveBoardOffset Offset

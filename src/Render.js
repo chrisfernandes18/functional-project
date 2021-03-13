@@ -5237,7 +5237,7 @@ var $author$project$Logic$newBoard = function (i) {
 			return ((rowInd === 3) || (rowInd === 4)) ? A2(
 				$elm$core$Array$initialize,
 				i,
-				function (ind) {
+				function (_v0) {
 					return $author$project$Structs$E;
 				}) : ((!rowEven) ? A2(
 				$elm$core$Array$initialize,
@@ -5783,13 +5783,7 @@ var $author$project$Logic$boardRef = F2(
 		var row = _v0.a;
 		var col = _v0.b;
 		var b = c.a;
-		var p1 = c.b;
-		var p2 = c.c;
-		var moves = c.d;
-		var cp = c.e;
-		var ct = c.f;
 		var arr = b.a;
-		var bs = b.b;
 		var _v3 = A2($elm$core$Array$get, row, arr);
 		if (_v3.$ === 'Nothing') {
 			return $author$project$Structs$E;
@@ -6104,8 +6098,6 @@ var $author$project$Logic$kingMe = F2(
 		} else {
 			var color = t.a;
 			var _v2 = t.b;
-			var curRow = _v2.a;
-			var curCol = _v2.b;
 			var move = t.c;
 			switch (move.$) {
 				case 'Inc':
@@ -6164,30 +6156,13 @@ var $author$project$Logic$legalMove = F3(
 			c,
 			A2($author$project$Structs$LL, newRow, newCol));
 		if (_v1.$ === 'E') {
-			var _v2 = _Utils_Tuple2(c, t);
-			if (_v2.b.$ === 'E') {
-				var _v3 = _v2.a;
-				var b = _v3.a;
-				var p1 = _v3.b;
-				var p2 = _v3.c;
-				var moves = _v3.d;
-				var cp = _v3.e;
-				var ct = _v3.f;
-				var _v4 = _v2.b;
+			if (t.$ === 'E') {
 				return false;
 			} else {
-				var _v5 = _v2.a;
-				var b = _v5.a;
-				var p1 = _v5.b;
-				var p2 = _v5.c;
-				var moves = _v5.d;
-				var cp = _v5.e;
-				var ct = _v5.f;
-				var _v6 = _v2.b;
-				var _v7 = _v6.b;
-				var curRow = _v7.a;
-				var curCol = _v7.b;
-				var move = _v6.c;
+				var _v3 = t.b;
+				var curRow = _v3.a;
+				var curCol = _v3.b;
+				var move = t.c;
 				var dir = A3(
 					$author$project$Logic$checkDirection,
 					move,
@@ -6269,9 +6244,7 @@ var $author$project$Logic$movePiece = F3(
 				var p2 = _v2.c;
 				var moves = _v2.d;
 				var cp = _v2.e;
-				var ct = _v2.f;
 				var _v4 = _v1.b;
-				var color = _v4.a;
 				var _v5 = _v4.b;
 				var curRow = _v5.a;
 				var curCol = _v5.b;
@@ -6369,20 +6342,171 @@ var $author$project$Logic$physicalToLogical = F2(
 var $author$project$Render$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(model, msg);
-		switch (_v0.b.$) {
-			case 'NoClick':
-				var _v1 = _v0.a;
-				var _v2 = _v1.a;
-				var _v3 = _v2.a;
-				var b = _v3.a;
-				var bs = _v3.b;
-				var p1 = _v2.b;
-				var p2 = _v2.c;
-				var moves = _v2.d;
-				var cp = _v2.e;
-				var ct = _v2.f;
-				var p = _v1.b;
-				var _v4 = _v0.b;
+		if (_v0.b.$ === 'Click') {
+			var _v1 = _v0.a;
+			var _v2 = _v1.a;
+			var _v3 = _v2.a;
+			var b = _v3.a;
+			var bs = _v3.b;
+			var p1 = _v2.b;
+			var p2 = _v2.c;
+			var moves = _v2.d;
+			var cp = _v2.e;
+			var ct = _v2.f;
+			var p = _v0.b.a;
+			var pl = A2(
+				$author$project$Logic$physicalToLogical,
+				A2($author$project$Structs$PL, p.x, p.y),
+				bs);
+			var nt = function () {
+				var _v8 = A2(
+					$author$project$Logic$boardRef,
+					A6(
+						$author$project$Structs$C,
+						A2($author$project$Structs$Board, b, bs),
+						p1,
+						p2,
+						moves,
+						cp,
+						ct),
+					pl);
+				if (_v8.$ === 'E') {
+					return $elm$core$Maybe$Nothing;
+				} else {
+					var c = _v8.a;
+					var l = _v8.b;
+					var m = _v8.c;
+					return $elm$core$Maybe$Just(
+						A3($author$project$Structs$Piece, c, l, m));
+				}
+			}();
+			var newTile = function () {
+				if (nt.$ === 'Nothing') {
+					return $author$project$Structs$E;
+				} else {
+					var t = nt.a;
+					return t;
+				}
+			}();
+			var curTile = function () {
+				if (ct.$ === 'Nothing') {
+					return $author$project$Structs$E;
+				} else {
+					var t = ct.a;
+					return t;
+				}
+			}();
+			if (A2($author$project$Logic$equalTiles, newTile, curTile)) {
+				return _Utils_Tuple2(
+					A2(
+						$author$project$Render$M,
+						A6(
+							$author$project$Structs$C,
+							A2($author$project$Structs$Board, b, bs),
+							p1,
+							p2,
+							moves,
+							cp,
+							$elm$core$Maybe$Nothing),
+						p),
+					$elm$core$Platform$Cmd$none);
+			} else {
+				if (ct.$ === 'Nothing') {
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Render$M,
+							A6(
+								$author$project$Structs$C,
+								A2($author$project$Structs$Board, b, bs),
+								p1,
+								p2,
+								moves,
+								cp,
+								nt),
+							p),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					var _v5 = A3(
+						$author$project$Logic$movePiece,
+						A6(
+							$author$project$Structs$C,
+							A2($author$project$Structs$Board, b, bs),
+							p1,
+							p2,
+							moves,
+							cp,
+							ct),
+						pl,
+						curTile);
+					if (_v5.$ === 'Nothing') {
+						return _Utils_Tuple2(
+							A2(
+								$author$project$Render$M,
+								A6(
+									$author$project$Structs$C,
+									A2($author$project$Structs$Board, b, bs),
+									p1,
+									p2,
+									moves,
+									cp,
+									ct),
+								p),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						var newC = _v5.a;
+						return _Utils_Tuple2(
+							A2($author$project$Render$M, newC, p),
+							$elm$core$Platform$Cmd$none);
+					}
+				}
+			}
+		} else {
+			if (_v0.b.a.b && _v0.b.a.b.b) {
+				var _v9 = _v0.a;
+				var _v10 = _v9.a;
+				var _v11 = _v10.a;
+				var b = _v11.a;
+				var _v12 = _v11.b;
+				var cs = _v12.a;
+				var pr = _v12.b;
+				var p1 = _v10.b;
+				var p2 = _v10.c;
+				var moves = _v10.d;
+				var cp = _v10.e;
+				var ct = _v10.f;
+				var p = _v9.b;
+				var _v13 = _v0.b.a;
+				var x = _v13.a;
+				var _v14 = _v13.b;
+				var y = _v14.a;
+				return _Utils_Tuple2(
+					A2(
+						$author$project$Render$M,
+						A6(
+							$author$project$Structs$C,
+							A2(
+								$author$project$Structs$Board,
+								b,
+								A4($author$project$Structs$BS, cs, pr, x, y)),
+							p1,
+							p2,
+							moves,
+							cp,
+							ct),
+						p),
+					$elm$core$Platform$Cmd$none);
+			} else {
+				var _v15 = _v0.a;
+				var _v16 = _v15.a;
+				var _v17 = _v16.a;
+				var b = _v17.a;
+				var bs = _v17.b;
+				var p1 = _v16.b;
+				var p2 = _v16.c;
+				var moves = _v16.d;
+				var cp = _v16.e;
+				var ct = _v16.f;
+				var p = _v15.b;
 				return _Utils_Tuple2(
 					A2(
 						$author$project$Render$M,
@@ -6396,185 +6520,7 @@ var $author$project$Render$update = F2(
 							ct),
 						p),
 					$elm$core$Platform$Cmd$none);
-			case 'Click':
-				var _v5 = _v0.a;
-				var _v6 = _v5.a;
-				var _v7 = _v6.a;
-				var b = _v7.a;
-				var bs = _v7.b;
-				var p1 = _v6.b;
-				var p2 = _v6.c;
-				var moves = _v6.d;
-				var cp = _v6.e;
-				var ct = _v6.f;
-				var p = _v0.b.a;
-				var pl = A2(
-					$author$project$Logic$physicalToLogical,
-					A2($author$project$Structs$PL, p.x, p.y),
-					bs);
-				var nt = function () {
-					var _v12 = A2(
-						$author$project$Logic$boardRef,
-						A6(
-							$author$project$Structs$C,
-							A2($author$project$Structs$Board, b, bs),
-							p1,
-							p2,
-							moves,
-							cp,
-							ct),
-						pl);
-					if (_v12.$ === 'E') {
-						return $elm$core$Maybe$Nothing;
-					} else {
-						var c = _v12.a;
-						var l = _v12.b;
-						var m = _v12.c;
-						return $elm$core$Maybe$Just(
-							A3($author$project$Structs$Piece, c, l, m));
-					}
-				}();
-				var newTile = function () {
-					if (nt.$ === 'Nothing') {
-						return $author$project$Structs$E;
-					} else {
-						var t = nt.a;
-						return t;
-					}
-				}();
-				var curTile = function () {
-					if (ct.$ === 'Nothing') {
-						return $author$project$Structs$E;
-					} else {
-						var t = ct.a;
-						return t;
-					}
-				}();
-				if (A2($author$project$Logic$equalTiles, newTile, curTile)) {
-					return _Utils_Tuple2(
-						A2(
-							$author$project$Render$M,
-							A6(
-								$author$project$Structs$C,
-								A2($author$project$Structs$Board, b, bs),
-								p1,
-								p2,
-								moves,
-								cp,
-								$elm$core$Maybe$Nothing),
-							p),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					if (ct.$ === 'Nothing') {
-						return _Utils_Tuple2(
-							A2(
-								$author$project$Render$M,
-								A6(
-									$author$project$Structs$C,
-									A2($author$project$Structs$Board, b, bs),
-									p1,
-									p2,
-									moves,
-									cp,
-									nt),
-								p),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						var _v9 = A3(
-							$author$project$Logic$movePiece,
-							A6(
-								$author$project$Structs$C,
-								A2($author$project$Structs$Board, b, bs),
-								p1,
-								p2,
-								moves,
-								cp,
-								ct),
-							pl,
-							curTile);
-						if (_v9.$ === 'Nothing') {
-							return _Utils_Tuple2(
-								A2(
-									$author$project$Render$M,
-									A6(
-										$author$project$Structs$C,
-										A2($author$project$Structs$Board, b, bs),
-										p1,
-										p2,
-										moves,
-										cp,
-										ct),
-									p),
-								$elm$core$Platform$Cmd$none);
-						} else {
-							var newC = _v9.a;
-							return _Utils_Tuple2(
-								A2($author$project$Render$M, newC, p),
-								$elm$core$Platform$Cmd$none);
-						}
-					}
-				}
-			default:
-				if (_v0.b.a.b && _v0.b.a.b.b) {
-					var _v13 = _v0.a;
-					var _v14 = _v13.a;
-					var _v15 = _v14.a;
-					var b = _v15.a;
-					var _v16 = _v15.b;
-					var cs = _v16.a;
-					var pr = _v16.b;
-					var p1 = _v14.b;
-					var p2 = _v14.c;
-					var moves = _v14.d;
-					var cp = _v14.e;
-					var ct = _v14.f;
-					var p = _v13.b;
-					var _v17 = _v0.b.a;
-					var x = _v17.a;
-					var _v18 = _v17.b;
-					var y = _v18.a;
-					return _Utils_Tuple2(
-						A2(
-							$author$project$Render$M,
-							A6(
-								$author$project$Structs$C,
-								A2(
-									$author$project$Structs$Board,
-									b,
-									A4($author$project$Structs$BS, cs, pr, x, y)),
-								p1,
-								p2,
-								moves,
-								cp,
-								ct),
-							p),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					var _v19 = _v0.a;
-					var _v20 = _v19.a;
-					var _v21 = _v20.a;
-					var b = _v21.a;
-					var bs = _v21.b;
-					var p1 = _v20.b;
-					var p2 = _v20.c;
-					var moves = _v20.d;
-					var cp = _v20.e;
-					var ct = _v20.f;
-					var p = _v19.b;
-					return _Utils_Tuple2(
-						A2(
-							$author$project$Render$M,
-							A6(
-								$author$project$Structs$C,
-								A2($author$project$Structs$Board, b, bs),
-								p1,
-								p2,
-								moves,
-								cp,
-								ct),
-							p),
-						$elm$core$Platform$Cmd$none);
-				}
+			}
 		}
 	});
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
@@ -6714,8 +6660,6 @@ var $author$project$Render$boardToHTML = function (b) {
 							} else {
 								var color = tile.a;
 								var _v3 = tile.b;
-								var currcol = _v3.a;
-								var currow = _v3.b;
 								if (color.$ === 'B') {
 									return ((evenRow && evenCol) || ((!evenRow) && (!evenCol))) ? A2(
 										$elm$html$Html$td,

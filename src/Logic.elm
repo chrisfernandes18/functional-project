@@ -72,7 +72,7 @@ newBoard i =
                             modBy 2 rowInd
                     in
                     if rowInd == 3 || rowInd == 4 then
-                        Array.initialize i (\ind -> E)
+                        Array.initialize i (\_ -> E)
 
                     else if rowEven == 0 then
                         Array.initialize i
@@ -278,7 +278,7 @@ kingMe (LL newRow newCol) t =
         E ->
             E
 
-        Piece color (LL curRow curCol) move ->
+        Piece color (LL _ _) move ->
             case move of
                 Inc ->
                     if newRow == 7 then
@@ -296,24 +296,6 @@ kingMe (LL newRow newCol) t =
 
                 _ ->
                     t
-
-
-setCurrentTile : Checkers -> LogicalLoc -> Checkers
-setCurrentTile c ll =
-    -- Sets the current tile slot within the Checkers struct
-    -- given the location that was 'clicked'
-    let
-        tileSelection =
-            boardRef c ll
-    in
-    case c of
-        C b p1 p2 moves cp ct ->
-            case tileSelection of
-                E ->
-                    C b p1 p2 moves cp Nothing
-
-                Piece color cll move ->
-                    C b p1 p2 moves cp (Just (Piece color cll move))
 
 
 
@@ -347,9 +329,9 @@ boardRef c (LL row col) =
     -- Takes the game and a location and returns the tile
     -- if its Empty or a Piece
     case c of
-        C b p1 p2 moves cp ct ->
+        C b _ _ _ _ _ ->
             case b of
-                Board arr bs ->
+                Board arr _ ->
                     case Array.get row arr of
                         Nothing ->
                             E
@@ -369,11 +351,11 @@ legalMove c (LL newRow newCol) t =
     -- piece that is selected returns if that piece can move
     case boardRef c (LL newRow newCol) of
         E ->
-            case ( c, t ) of
-                ( C b p1 p2 moves cp ct, E ) ->
+            case t of
+                E ->
                     False
 
-                ( C b p1 p2 moves cp ct, Piece _ (LL curRow curCol) move ) ->
+                Piece _ (LL curRow curCol) move ->
                     let
                         cap =
                             checkCapture c move (LL curRow curCol) (LL newRow newCol)
@@ -401,7 +383,7 @@ movePiece c (LL newRow newCol) t =
     -- nothing
     if legalMove c (LL newRow newCol) t then
         case ( c, t ) of
-            ( C (Board b bs) p1 p2 moves cp ct, Piece color (LL curRow curCol) move ) ->
+            ( C (Board b bs) p1 p2 moves cp _, Piece _ (LL curRow curCol) move ) ->
                 let
                     -- will king the piece if it's a king
                     newPiece =

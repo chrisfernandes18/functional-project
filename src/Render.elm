@@ -10,7 +10,6 @@ import Html exposing (Html)
 import Html.Attributes as HAttrs
 import Json.Decode as Decode
 import Logic exposing (..)
-import String exposing (toInt)
 import Structs exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs
@@ -29,8 +28,7 @@ type Model
 
 
 type Msg
-    = NoClick
-    | Click Point
+    = Click Point
     | Offset (List Float)
 
 
@@ -119,7 +117,7 @@ boardToHTML b =
                                             else
                                                 Html.td [ hheight, hwidth ] []
 
-                                        Piece color (LL currcol currow) _ ->
+                                        Piece color (LL _ _) _ ->
                                             case color of
                                                 B ->
                                                     if (evenRow && evenCol) || (not evenRow && not evenCol) then
@@ -199,9 +197,6 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model, msg ) of
-        ( M (C (Board b bs) p1 p2 moves cp ct) p, NoClick ) ->
-            ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
-
         ( M (C (Board b bs) p1 p2 moves cp ct) _, Click p ) ->
             let
                 pl =

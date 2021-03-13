@@ -1,7 +1,6 @@
 module Logic exposing
     ( boardRef
-    , checkCapture
-    , legalMove
+    , equalTiles
     , logicalToPhysical
     , movePiece
     , newBoard
@@ -17,21 +16,29 @@ import Structs exposing (..)
 {-------------------------- Helper Functions --------------------------}
 
 
-distancePL : PhysicalLoc -> PhysicalLoc -> Float
-distancePL p1 p2 =
-    -- checks the distance between two physical locations
-    case ( p1, p2 ) of
-        ( PL x1 y1, PL x2 y2 ) ->
-            sqrt ((x1 - x2) ^ 2 + (y1 - y2) ^ 2)
+equalTiles : Tile -> Tile -> Bool
+equalTiles t1 t2 =
+    case ( t1, t2 ) of
+        ( Piece B (LL r1 c1) Inc, Piece B (LL r2 c2) Inc ) ->
+            (r1 == r2) && (c1 == c2)
 
+        ( Piece B (LL r1 c1) Dec, Piece B (LL r2 c2) Dec ) ->
+            (r1 == r2) && (c1 == c2)
 
-withinPiece : PhysicalLoc -> PhysicalLoc -> BoardSpec -> Bool
-withinPiece p1 p2 bs =
-    -- checks if two physical locations are indeed the same checker
-    -- piece
-    case bs of
-        BS _ pr _ _ ->
-            distancePL p1 p2 <= pr
+        ( Piece B (LL r1 c1) Both, Piece B (LL r2 c2) Both ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece R (LL r1 c1) Inc, Piece R (LL r2 c2) Inc ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece R (LL r1 c1) Dec, Piece R (LL r2 c2) Dec ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece R (LL r1 c1) Both, Piece R (LL r2 c2) Both ) ->
+            (r1 == r2) && (c1 == c2)
+
+        _ ->
+            False
 
 
 newTile : Maybe Color -> Int -> Int -> Tile

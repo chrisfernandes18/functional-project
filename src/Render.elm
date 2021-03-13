@@ -207,13 +207,21 @@ update msg model =
                 pl =
                     physicalToLogical (PL p.x p.y) bs
 
-                ref =
+                nt =
                     case boardRef (C (Board b bs) p1 p2 moves cp ct) pl of
                         E ->
                             Nothing
 
                         Piece c l m ->
                             Just (Piece c l m)
+
+                newTile =
+                    case nt of
+                        Nothing ->
+                            E
+
+                        Just t ->
+                            t
 
                 curTile =
                     case ct of
@@ -223,17 +231,21 @@ update msg model =
                         Just t ->
                             t
             in
-            case ct of
-                Nothing ->
-                    ( M (C (Board b bs) p1 p2 moves cp ref) p, Cmd.none )
+            if equalTiles newTile curTile then
+                ( M (C (Board b bs) p1 p2 moves cp Nothing) p, Cmd.none )
 
-                _ ->
-                    case movePiece (C (Board b bs) p1 p2 moves cp ct) pl curTile of
-                        Nothing ->
-                            ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
+            else
+                case ct of
+                    Nothing ->
+                        ( M (C (Board b bs) p1 p2 moves cp nt) p, Cmd.none )
 
-                        Just newC ->
-                            ( M newC p, Cmd.none )
+                    _ ->
+                        case movePiece (C (Board b bs) p1 p2 moves cp ct) pl curTile of
+                            Nothing ->
+                                ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
+
+                            Just newC ->
+                                ( M newC p, Cmd.none )
 
         ( M (C (Board b (BS cs pr _ _)) p1 p2 moves cp ct) p, Offset (x :: y :: _) ) ->
             ( M (C (Board b (BS cs pr x y)) p1 p2 moves cp ct) p, Cmd.none )

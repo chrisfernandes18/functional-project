@@ -5198,12 +5198,8 @@ var $author$project$Structs$C = F6(
 	function (a, b, c, d, e, f) {
 		return {$: 'C', a: a, b: b, c: c, d: d, e: e, f: f};
 	});
-var $author$project$Structs$Human = F2(
-	function (a, b) {
-		return {$: 'Human', a: a, b: b};
-	});
-var $author$project$Structs$R = {$: 'R'};
 var $author$project$Structs$E = {$: 'E'};
+var $author$project$Structs$R = {$: 'R'};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Structs$Dec = {$: 'Dec'};
 var $author$project$Structs$Inc = {$: 'Inc'};
@@ -5277,8 +5273,8 @@ var $author$project$Logic$testCheckers = A6(
 		$author$project$Structs$Board,
 		$author$project$Logic$newBoard(8),
 		A4($author$project$Structs$BS, 70, 30, 10, 10)),
-	A2($author$project$Structs$Human, 'Christian', $author$project$Structs$B),
-	A2($author$project$Structs$Human, 'Angela', $author$project$Structs$R),
+	$elm$core$Maybe$Nothing,
+	$elm$core$Maybe$Nothing,
 	$author$project$Structs$B,
 	0,
 	$elm$core$Maybe$Nothing);
@@ -5732,6 +5728,10 @@ var $author$project$Render$subscriptions = function (_v0) {
 				$author$project$Render$recieveBoardOffset($author$project$Render$Offset)
 			]));
 };
+var $author$project$Structs$Human = F2(
+	function (a, b) {
+		return {$: 'Human', a: a, b: b};
+	});
 var $author$project$Structs$PL = F2(
 	function (a, b) {
 		return {$: 'PL', a: a, b: b};
@@ -6378,95 +6378,93 @@ var $author$project$Logic$physicalToLogical = F2(
 var $author$project$Render$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(model, msg);
-		if (_v0.b.$ === 'Click') {
-			var _v1 = _v0.a;
-			var _v2 = _v1.a;
-			var _v3 = _v2.a;
-			var b = _v3.a;
-			var bs = _v3.b;
-			var p1 = _v2.b;
-			var p2 = _v2.c;
-			var cp = _v2.d;
-			var moves = _v2.e;
-			var ct = _v2.f;
-			var p = _v0.b.a;
-			var pl = A2(
-				$author$project$Logic$physicalToLogical,
-				A2($author$project$Structs$PL, p.x, p.y),
-				bs);
-			var nt = function () {
-				var _v11 = A2(
-					$author$project$Logic$boardRef,
-					A6(
-						$author$project$Structs$C,
-						A2($author$project$Structs$Board, b, bs),
-						p1,
-						p2,
-						cp,
-						moves,
-						ct),
-					pl);
-				if (_v11.$ === 'E') {
-					return $elm$core$Maybe$Nothing;
-				} else {
-					var c = _v11.a;
-					var l = _v11.b;
-					var m = _v11.c;
-					return $elm$core$Maybe$Just(
-						A3($author$project$Structs$Piece, c, l, m));
-				}
-			}();
-			var newTile = function () {
-				if (nt.$ === 'Nothing') {
-					return $author$project$Structs$E;
-				} else {
-					var t = nt.a;
-					return t;
-				}
-			}();
-			var curTile = function () {
-				if (ct.$ === 'Nothing') {
-					return $author$project$Structs$E;
-				} else {
-					var t = ct.a;
-					return t;
-				}
-			}();
-			if (A2($author$project$Logic$equalTiles, newTile, curTile)) {
-				return _Utils_Tuple2(
-					A2(
-						$author$project$Render$M,
-						A6(
-							$author$project$Structs$C,
-							A2($author$project$Structs$Board, b, bs),
-							p1,
-							p2,
-							cp,
-							moves,
-							$elm$core$Maybe$Nothing),
-						p),
-					$elm$core$Platform$Cmd$none);
-			} else {
-				if (newTile.$ === 'Piece') {
-					var color = newTile.a;
-					if (A2($author$project$Logic$equalColors, color, cp)) {
-						if (ct.$ === 'Nothing') {
-							return _Utils_Tuple2(
-								A2(
-									$author$project$Render$M,
-									A6(
-										$author$project$Structs$C,
-										A2($author$project$Structs$Board, b, bs),
-										p1,
-										p2,
-										cp,
-										moves,
-										nt),
-									p),
-								$elm$core$Platform$Cmd$none);
+		_v0$3:
+		while (true) {
+			switch (_v0.b.$) {
+				case 'Info':
+					var _v1 = _v0.a;
+					var _v2 = _v1.a;
+					var _v3 = _v2.a;
+					var b = _v3.a;
+					var bs = _v3.b;
+					var cp = _v2.d;
+					var moves = _v2.e;
+					var ct = _v2.f;
+					var p = _v1.b;
+					var rec = _v0.b.a;
+					return _Utils_Tuple2(
+						A2(
+							$author$project$Render$M,
+							A6(
+								$author$project$Structs$C,
+								A2($author$project$Structs$Board, b, bs),
+								$elm$core$Maybe$Just(
+									A2($author$project$Structs$Human, rec.p1, $author$project$Structs$B)),
+								$elm$core$Maybe$Just(
+									A2($author$project$Structs$Human, rec.p2, $author$project$Structs$R)),
+								cp,
+								moves,
+								ct),
+							p),
+						$elm$core$Platform$Cmd$none);
+				case 'Click':
+					var _v4 = _v0.a;
+					var _v5 = _v4.a;
+					var _v6 = _v5.a;
+					var b = _v6.a;
+					var bs = _v6.b;
+					var p1 = _v5.b;
+					var p2 = _v5.c;
+					var cp = _v5.d;
+					var moves = _v5.e;
+					var ct = _v5.f;
+					var p = _v0.b.a;
+					var pl = A2(
+						$author$project$Logic$physicalToLogical,
+						A2($author$project$Structs$PL, p.x, p.y),
+						bs);
+					var nt = function () {
+						var _v14 = A2(
+							$author$project$Logic$boardRef,
+							A6(
+								$author$project$Structs$C,
+								A2($author$project$Structs$Board, b, bs),
+								p1,
+								p2,
+								cp,
+								moves,
+								ct),
+							pl);
+						if (_v14.$ === 'E') {
+							return $elm$core$Maybe$Nothing;
 						} else {
-							var _v6 = A3(
-								$author$project$Logic$movePiece,
+							var c = _v14.a;
+							var l = _v14.b;
+							var m = _v14.c;
+							return $elm$core$Maybe$Just(
+								A3($author$project$Structs$Piece, c, l, m));
+						}
+					}();
+					var newTile = function () {
+						if (nt.$ === 'Nothing') {
+							return $author$project$Structs$E;
+						} else {
+							var t = nt.a;
+							return t;
+						}
+					}();
+					var curTile = function () {
+						if (ct.$ === 'Nothing') {
+							return $author$project$Structs$E;
+						} else {
+							var t = ct.a;
+							return t;
+						}
+					}();
+					if (A2($author$project$Logic$equalTiles, newTile, curTile)) {
+						return _Utils_Tuple2(
+							A2(
+								$author$project$Render$M,
 								A6(
 									$author$project$Structs$C,
 									A2($author$project$Structs$Board, b, bs),
@@ -6474,10 +6472,62 @@ var $author$project$Render$update = F2(
 									p2,
 									cp,
 									moves,
-									ct),
-								pl,
-								curTile);
-							if (_v6.$ === 'Nothing') {
+									$elm$core$Maybe$Nothing),
+								p),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						if (newTile.$ === 'Piece') {
+							var color = newTile.a;
+							if (A2($author$project$Logic$equalColors, color, cp)) {
+								if (ct.$ === 'Nothing') {
+									return _Utils_Tuple2(
+										A2(
+											$author$project$Render$M,
+											A6(
+												$author$project$Structs$C,
+												A2($author$project$Structs$Board, b, bs),
+												p1,
+												p2,
+												cp,
+												moves,
+												nt),
+											p),
+										$elm$core$Platform$Cmd$none);
+								} else {
+									var _v9 = A3(
+										$author$project$Logic$movePiece,
+										A6(
+											$author$project$Structs$C,
+											A2($author$project$Structs$Board, b, bs),
+											p1,
+											p2,
+											cp,
+											moves,
+											ct),
+										pl,
+										curTile);
+									if (_v9.$ === 'Nothing') {
+										return _Utils_Tuple2(
+											A2(
+												$author$project$Render$M,
+												A6(
+													$author$project$Structs$C,
+													A2($author$project$Structs$Board, b, bs),
+													p1,
+													p2,
+													cp,
+													moves,
+													ct),
+												p),
+											$elm$core$Platform$Cmd$none);
+									} else {
+										var newC = _v9.a;
+										return _Utils_Tuple2(
+											A2($author$project$Render$M, newC, p),
+											$elm$core$Platform$Cmd$none);
+									}
+								}
+							} else {
 								return _Utils_Tuple2(
 									A2(
 										$author$project$Render$M,
@@ -6491,60 +6541,25 @@ var $author$project$Render$update = F2(
 											ct),
 										p),
 									$elm$core$Platform$Cmd$none);
-							} else {
-								var newC = _v6.a;
-								return _Utils_Tuple2(
-									A2($author$project$Render$M, newC, p),
-									$elm$core$Platform$Cmd$none);
 							}
-						}
-					} else {
-						return _Utils_Tuple2(
-							A2(
-								$author$project$Render$M,
-								A6(
-									$author$project$Structs$C,
-									A2($author$project$Structs$Board, b, bs),
-									p1,
-									p2,
-									cp,
-									moves,
-									ct),
-								p),
-							$elm$core$Platform$Cmd$none);
-					}
-				} else {
-					if (ct.$ === 'Nothing') {
-						return _Utils_Tuple2(
-							A2(
-								$author$project$Render$M,
-								A6(
-									$author$project$Structs$C,
-									A2($author$project$Structs$Board, b, bs),
-									p1,
-									p2,
-									cp,
-									moves,
-									nt),
-								p),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						var _v8 = A3(
-							$author$project$Logic$movePiece,
-							A6(
-								$author$project$Structs$C,
-								A2($author$project$Structs$Board, b, bs),
-								p1,
-								p2,
-								cp,
-								moves,
-								ct),
-							pl,
-							curTile);
-						if (_v8.$ === 'Nothing') {
-							return _Utils_Tuple2(
-								A2(
-									$author$project$Render$M,
+						} else {
+							if (ct.$ === 'Nothing') {
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Render$M,
+										A6(
+											$author$project$Structs$C,
+											A2($author$project$Structs$Board, b, bs),
+											p1,
+											p2,
+											cp,
+											moves,
+											nt),
+										p),
+									$elm$core$Platform$Cmd$none);
+							} else {
+								var _v11 = A3(
+									$author$project$Logic$movePiece,
 									A6(
 										$author$project$Structs$C,
 										A2($author$project$Structs$Board, b, bs),
@@ -6553,79 +6568,97 @@ var $author$project$Render$update = F2(
 										cp,
 										moves,
 										ct),
-									p),
-								$elm$core$Platform$Cmd$none);
-						} else {
-							var newC = _v8.a;
-							return _Utils_Tuple2(
-								A2($author$project$Render$M, newC, p),
-								$elm$core$Platform$Cmd$none);
+									pl,
+									curTile);
+								if (_v11.$ === 'Nothing') {
+									return _Utils_Tuple2(
+										A2(
+											$author$project$Render$M,
+											A6(
+												$author$project$Structs$C,
+												A2($author$project$Structs$Board, b, bs),
+												p1,
+												p2,
+												cp,
+												moves,
+												ct),
+											p),
+										$elm$core$Platform$Cmd$none);
+								} else {
+									var newC = _v11.a;
+									return _Utils_Tuple2(
+										A2($author$project$Render$M, newC, p),
+										$elm$core$Platform$Cmd$none);
+								}
+							}
 						}
 					}
-				}
-			}
-		} else {
-			if (_v0.b.a.b && _v0.b.a.b.b) {
-				var _v12 = _v0.a;
-				var _v13 = _v12.a;
-				var _v14 = _v13.a;
-				var b = _v14.a;
-				var _v15 = _v14.b;
-				var cs = _v15.a;
-				var pr = _v15.b;
-				var p1 = _v13.b;
-				var p2 = _v13.c;
-				var cp = _v13.d;
-				var moves = _v13.e;
-				var ct = _v13.f;
-				var p = _v12.b;
-				var _v16 = _v0.b.a;
-				var x = _v16.a;
-				var _v17 = _v16.b;
-				var y = _v17.a;
-				return _Utils_Tuple2(
-					A2(
-						$author$project$Render$M,
-						A6(
-							$author$project$Structs$C,
+				case 'Offset':
+					if (_v0.b.a.b && _v0.b.a.b.b) {
+						var _v15 = _v0.a;
+						var _v16 = _v15.a;
+						var _v17 = _v16.a;
+						var b = _v17.a;
+						var _v18 = _v17.b;
+						var cs = _v18.a;
+						var pr = _v18.b;
+						var p1 = _v16.b;
+						var p2 = _v16.c;
+						var cp = _v16.d;
+						var moves = _v16.e;
+						var ct = _v16.f;
+						var p = _v15.b;
+						var _v19 = _v0.b.a;
+						var x = _v19.a;
+						var _v20 = _v19.b;
+						var y = _v20.a;
+						return _Utils_Tuple2(
 							A2(
-								$author$project$Structs$Board,
-								b,
-								A4($author$project$Structs$BS, cs, pr, x, y)),
-							p1,
-							p2,
-							cp,
-							moves,
-							ct),
-						p),
-					$elm$core$Platform$Cmd$none);
-			} else {
-				var _v18 = _v0.a;
-				var _v19 = _v18.a;
-				var _v20 = _v19.a;
-				var b = _v20.a;
-				var bs = _v20.b;
-				var p1 = _v19.b;
-				var p2 = _v19.c;
-				var cp = _v19.d;
-				var moves = _v19.e;
-				var ct = _v19.f;
-				var p = _v18.b;
-				return _Utils_Tuple2(
-					A2(
-						$author$project$Render$M,
-						A6(
-							$author$project$Structs$C,
-							A2($author$project$Structs$Board, b, bs),
-							p1,
-							p2,
-							cp,
-							moves,
-							ct),
-						p),
-					$elm$core$Platform$Cmd$none);
+								$author$project$Render$M,
+								A6(
+									$author$project$Structs$C,
+									A2(
+										$author$project$Structs$Board,
+										b,
+										A4($author$project$Structs$BS, cs, pr, x, y)),
+									p1,
+									p2,
+									cp,
+									moves,
+									ct),
+								p),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						break _v0$3;
+					}
+				default:
+					break _v0$3;
 			}
 		}
+		var _v21 = _v0.a;
+		var _v22 = _v21.a;
+		var _v23 = _v22.a;
+		var b = _v23.a;
+		var bs = _v23.b;
+		var p1 = _v22.b;
+		var p2 = _v22.c;
+		var cp = _v22.d;
+		var moves = _v22.e;
+		var ct = _v22.f;
+		var p = _v21.b;
+		return _Utils_Tuple2(
+			A2(
+				$author$project$Render$M,
+				A6(
+					$author$project$Structs$C,
+					A2($author$project$Structs$Board, b, bs),
+					p1,
+					p2,
+					cp,
+					moves,
+					ct),
+				p),
+			$elm$core$Platform$Cmd$none);
 	});
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
@@ -6866,9 +6899,18 @@ var $author$project$Render$boardToHTML = function (b) {
 			]),
 		arrayLst);
 };
+var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
+var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$select = _VirtualDom_node('select');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Render$view = function (model) {
 	var _v1 = model.a;
 	var _v2 = _v1.a;
@@ -6904,6 +6946,100 @@ var $author$project$Render$view = function (model) {
 							$author$project$Structs$Board,
 							b,
 							A4($author$project$Structs$BS, cs, pr, mx, my)))
+					])),
+				A2(
+				$elm$html$Html$form,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$id('players')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$name('player1'),
+								$elm$html$Html$Attributes$placeholder('Player 1')
+							]),
+						_List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$name('player2'),
+								$elm$html$Html$Attributes$placeholder('Player 2')
+							]),
+						_List_Nil),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$select,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id('choice1')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('human')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Human')
+									])),
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('robot')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Robot')
+									]))
+							])),
+						A2(
+						$elm$html$Html$select,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$id('choice2')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('human')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Human')
+									])),
+								A2(
+								$elm$html$Html$option,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$value('robot')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Robot')
+									]))
+							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('submit')
+							]),
+						_List_Nil)
 					]))
 			]));
 };

@@ -497,4 +497,4 @@ movePiece c (LL newRow newCol) t =
 testCheckers : Checkers
 testCheckers =
     -- test game
-    C (Board (newBoard 8) (BS 70 30 10 10)) (Human "Christian" B) (Human "Angela" R) B 0 Nothing
+    C (Board (newBoard 8) (BS 70 30 10 10)) Nothing Nothing B 0 Nothing

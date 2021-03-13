@@ -8,6 +8,7 @@ import Browser.Events
 import Debug
 import Html exposing (Html)
 import Html.Attributes as HAttrs
+import Html.Events as HEvents
 import Json.Decode as Decode
 import Logic exposing (..)
 import Structs exposing (..)
@@ -30,6 +31,8 @@ type Model
 type Msg
     = Click Point
     | Offset (List Float)
+    | FormSubmitted
+    | Info { p1 : String, p2 : String }
 
 
 type alias Flags =
@@ -179,12 +182,39 @@ view model =
                 , Html.div
                     []
                     [ boardToHTML (Board b (BS cs pr mx my)) ]
+                , Html.form
+                    [ HAttrs.id "players" ]
+                    [ Html.input
+                        [ HAttrs.type_ "text", HAttrs.name "player1", HAttrs.placeholder "Player 1" ]
+                        []
+                    , Html.input
+                        [ HAttrs.type_ "text", HAttrs.name "player2", HAttrs.placeholder "Player 2" ]
+                        []
+                    , Html.br [] []
+                    , Html.select
+                        [ HAttrs.id "choice1" ]
+                        [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
+                        , Html.option [ HAttrs.value "robot" ] [ Html.text "Robot" ]
+                        ]
+                    , Html.select
+                        [ HAttrs.id "choice2" ]
+                        [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
+                        , Html.option [ HAttrs.value "robot" ] [ Html.text "Robot" ]
+                        ]
+                    , Html.br [] []
+                    , Html.input
+                        [ HAttrs.type_ "submit" ]
+                        []
+                    ]
                 ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model, msg ) of
+        ( M (C (Board b bs) _ _ cp moves ct) p, Info rec ) ->
+            ( M (C (Board b bs) (Just (Human rec.p1 B)) (Just (Human rec.p2 R)) cp moves ct) p, Cmd.none )
+
         ( M (C (Board b bs) p1 p2 cp moves ct) _, Click p ) ->
             let
                 pl =

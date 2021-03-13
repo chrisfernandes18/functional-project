@@ -1,4 +1,3 @@
-
 table {
   border: 0px;
   border-spacing: 0px;
@@ -27,4 +26,8 @@ svg.blackPiece {
   fill: black;
   stroke: white;
   display: block;
+}
+
+input {
+  text-align: center;
 }

@@ -493,23 +493,39 @@ movePiece c (LL newRow newCol) t =
     else
         Nothing
 
--- getPlayerTiles : Board -> 
+
+
+-- getPlayerTiles : Board ->
+
 
 endGame : Checkers -> Bool
-endGame (C (Board board _) _ _ currPlayer _ _) = 
-    let 
+endGame (C (Board board _) _ _ currPlayer _ _) =
+    let
         -- rowContains? is True if one row has one element of curPlayer
-        currentPlayerTile = 
-            (\tile -> 
-                case tile of 
-                    E -> False
-                    Piece c _ _ -> equalColors currPlayer c)
-        rowContains = (\row -> not (Array.isEmpty (Array.filter currentPlayerTile row)))
-        containsArr = Array.map rowContains board
+        currentPlayerTile =
+            \tile ->
+                case tile of
+                    E ->
+                        False
+
+                    Piece c _ _ ->
+                        equalColors currPlayer c
+
+        rowContains =
+            \row -> not (Array.isEmpty (Array.filter currentPlayerTile row))
+
+        containsArr =
+            Array.map rowContains board
     in
-        if Array.foldr (||) False containsArr
-        then False
-        else True -- no more pieces left 
+    if Array.foldr (||) False containsArr then
+        False
+
+    else
+        True
+
+
+
+-- no more pieces left
 
 
 testCheckers : Checkers

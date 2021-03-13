@@ -493,6 +493,8 @@ movePiece c (LL newRow newCol) t =
     else
         Nothing
 
+-- getPlayerTiles : Board -> 
+
 endGame : Checkers -> Bool
 endGame (C (Board board _) _ _ currPlayer _ _) = 
     let 

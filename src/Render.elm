@@ -172,25 +172,13 @@ view model =
             let
                 everything =
                     Debug.toString model
-
-                pointStr =
-                    Debug.toString p
-
-                refStr =
-                    Debug.toString (boardRef (C (Board b (BS cs pr mx my)) p1 p2 cp moves ct) (physicalToLogical (PL p.x p.y) (BS cs pr mx my)))
-
-                logicalStr =
-                    Debug.toString (physicalToLogical (PL p.x p.y) (BS cs pr mx my))
-
-                margins =
-                    Debug.toString mx ++ " " ++ Debug.toString my
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
                 [ Html.text everything
                 , Html.div
                     []
-                    [ boardToHTML (Board b (BS cs pr mx my)), Html.text pointStr, Html.text logicalStr, Html.text refStr, Html.text margins ]
+                    [ boardToHTML (Board b (BS cs pr mx my)) ]
                 ]
 
 

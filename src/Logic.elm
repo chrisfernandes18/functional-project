@@ -1,6 +1,5 @@
 module Logic exposing
     ( boardRef
-    , changeColor
     , equalColors
     , equalTiles
     , logicalToPhysical
@@ -169,7 +168,7 @@ checkDirection m (LL curRow curCol) (LL newRow newCol) =
                 decOk =
                     ((newRow < curRow) && (curRow - 1) == newRow) && (((curCol + 1) == newCol) || ((curCol - 1) == newCol))
             in
-            incOk && decOk
+            incOk || decOk
 
 
 checkCapture : Checkers -> Move -> LogicalLoc -> LogicalLoc -> Bool
@@ -263,7 +262,13 @@ checkCapture c m (LL curRow curCol) (LL newRow newCol) =
 
                     tile =
                         boardRef c
-                            (LL (curRow + 1)
+                            (LL
+                                (if newRow > curRow then
+                                    curRow + 1
+
+                                 else
+                                    curRow - 1
+                                )
                                 (if dif < 0 then
                                     curCol + 1
 
@@ -320,7 +325,7 @@ kingMe (LL newRow newCol) t =
                         Piece color (LL newRow newCol) move
 
                 _ ->
-                    t
+                    Piece color (LL newRow newCol) move
 
 
 

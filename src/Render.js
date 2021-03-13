@@ -6078,7 +6078,7 @@ var $author$project$Logic$checkCapture = F4(
 						c,
 						A2(
 							$author$project$Structs$LL,
-							curRow + 1,
+							(_Utils_cmp(newRow, curRow) > 0) ? (curRow + 1) : (curRow - 1),
 							(dif < 0) ? (curCol + 1) : (curCol - 1)));
 					var curtile = A2(
 						$author$project$Logic$boardRef,
@@ -6153,7 +6153,11 @@ var $author$project$Logic$kingMe = F2(
 						A2($author$project$Structs$LL, newRow, newCol),
 						move);
 				default:
-					return t;
+					return A3(
+						$author$project$Structs$Piece,
+						color,
+						A2($author$project$Structs$LL, newRow, newCol),
+						move);
 			}
 		}
 	});
@@ -6171,7 +6175,7 @@ var $author$project$Logic$checkDirection = F3(
 			default:
 				var incOk = ((_Utils_cmp(newRow, curRow) > 0) && _Utils_eq(curRow + 1, newRow)) && (_Utils_eq(curCol + 1, newCol) || _Utils_eq(curCol - 1, newCol));
 				var decOk = ((_Utils_cmp(newRow, curRow) < 0) && _Utils_eq(curRow - 1, newRow)) && (_Utils_eq(curCol + 1, newCol) || _Utils_eq(curCol - 1, newCol));
-				return incOk && decOk;
+				return incOk || decOk;
 		}
 	});
 var $author$project$Logic$withinBounds = function (_v0) {
@@ -6880,31 +6884,6 @@ var $author$project$Render$view = function (model) {
 	var moves = _v1.e;
 	var ct = _v1.f;
 	var p = model.b;
-	var refStr = $elm$core$Debug$toString(
-		A2(
-			$author$project$Logic$boardRef,
-			A6(
-				$author$project$Structs$C,
-				A2(
-					$author$project$Structs$Board,
-					b,
-					A4($author$project$Structs$BS, cs, pr, mx, my)),
-				p1,
-				p2,
-				cp,
-				moves,
-				ct),
-			A2(
-				$author$project$Logic$physicalToLogical,
-				A2($author$project$Structs$PL, p.x, p.y),
-				A4($author$project$Structs$BS, cs, pr, mx, my))));
-	var pointStr = $elm$core$Debug$toString(p);
-	var margins = $elm$core$Debug$toString(mx) + (' ' + $elm$core$Debug$toString(my));
-	var logicalStr = $elm$core$Debug$toString(
-		A2(
-			$author$project$Logic$physicalToLogical,
-			A2($author$project$Structs$PL, p.x, p.y),
-			A4($author$project$Structs$BS, cs, pr, mx, my)));
 	var everything = $elm$core$Debug$toString(model);
 	return A2(
 		$elm$html$Html$div,
@@ -6924,11 +6903,7 @@ var $author$project$Render$view = function (model) {
 						A2(
 							$author$project$Structs$Board,
 							b,
-							A4($author$project$Structs$BS, cs, pr, mx, my))),
-						$elm$html$Html$text(pointStr),
-						$elm$html$Html$text(logicalStr),
-						$elm$html$Html$text(refStr),
-						$elm$html$Html$text(margins)
+							A4($author$project$Structs$BS, cs, pr, mx, my)))
 					]))
 			]));
 };

@@ -82,11 +82,19 @@ initModel =
     M testCheckers { x = 0, y = 0 }
 
 
-boardToHTML : Board -> Html Msg
-boardToHTML b =
+boardToHTML : Board -> Maybe Tile -> Html Msg
+boardToHTML b til =
     case b of
         Board arr (BS cs pr _ _) ->
             let
+                curTile =
+                    case til of
+                        Nothing ->
+                            E
+
+                        Just t ->
+                            t
+
                 hheight =
                     HAttrs.style "height" (Debug.toString cs ++ "px")
 
@@ -120,7 +128,11 @@ boardToHTML b =
                                             else
                                                 Html.td [ hheight, hwidth ] []
 
-                                        Piece color (LL _ _) move ->
+                                        Piece color (LL c1 r1) move ->
+                                            let
+                                                equalTile =
+                                                    equalTiles (Piece color (LL c1 r1) move) curTile
+                                            in
                                             case color of
                                                 B ->
                                                     if (evenRow && evenCol) || (not evenRow && not evenCol) then
@@ -132,7 +144,18 @@ boardToHTML b =
                                                                 Html.td
                                                                     [ hheight, hwidth ]
                                                                     [ svg
-                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPieceKing" ]
+                                                                        [ swidth
+                                                                        , sheight
+                                                                        , SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs)
+                                                                        , SAttrs.class "blackPieceKing"
+                                                                        , SAttrs.id
+                                                                            (if equalTile then
+                                                                                "selected"
+
+                                                                             else
+                                                                                ""
+                                                                            )
+                                                                        ]
                                                                         [ circle
                                                                             [ SAttrs.cx (String.fromFloat (cs / 2.0))
                                                                             , SAttrs.cy (String.fromFloat (cs / 2.0))
@@ -146,7 +169,18 @@ boardToHTML b =
                                                                 Html.td
                                                                     [ hheight, hwidth ]
                                                                     [ svg
-                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPiece" ]
+                                                                        [ swidth
+                                                                        , sheight
+                                                                        , SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs)
+                                                                        , SAttrs.class "blackPiece"
+                                                                        , SAttrs.id
+                                                                            (if equalTile then
+                                                                                "selected"
+
+                                                                             else
+                                                                                ""
+                                                                            )
+                                                                        ]
                                                                         [ circle
                                                                             [ SAttrs.cx (String.fromFloat (cs / 2.0))
                                                                             , SAttrs.cy (String.fromFloat (cs / 2.0))
@@ -166,7 +200,18 @@ boardToHTML b =
                                                                 Html.td
                                                                     [ hheight, hwidth ]
                                                                     [ svg
-                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPieceKing" ]
+                                                                        [ swidth
+                                                                        , sheight
+                                                                        , SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs)
+                                                                        , SAttrs.class "redPieceKing"
+                                                                        , SAttrs.id
+                                                                            (if equalTile then
+                                                                                "selected"
+
+                                                                             else
+                                                                                ""
+                                                                            )
+                                                                        ]
                                                                         [ circle
                                                                             [ SAttrs.cx (String.fromFloat (cs / 2.0))
                                                                             , SAttrs.cy (String.fromFloat (cs / 2.0))
@@ -180,7 +225,18 @@ boardToHTML b =
                                                                 Html.td
                                                                     [ hheight, hwidth ]
                                                                     [ svg
-                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPiece" ]
+                                                                        [ swidth
+                                                                        , sheight
+                                                                        , SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs)
+                                                                        , SAttrs.class "redPiece"
+                                                                        , SAttrs.id
+                                                                            (if equalTile then
+                                                                                "selected"
+
+                                                                             else
+                                                                                ""
+                                                                            )
+                                                                        ]
                                                                         [ circle
                                                                             [ SAttrs.cx (String.fromFloat (cs / 2.0))
                                                                             , SAttrs.cy (String.fromFloat (cs / 2.0))
@@ -213,7 +269,7 @@ view model =
                 [ Html.text everything
                 , Html.div
                     []
-                    [ boardToHTML (Board b (BS cs pr mx my)) ]
+                    [ boardToHTML (Board b (BS cs pr mx my)) ct ]
                 , Html.form
                     [ HAttrs.id "players" ]
                     [ Html.input

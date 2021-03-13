@@ -16,6 +16,10 @@ td.noPiece {
   background-color: saddlebrown;
 }
 
+svg#selected {
+  fill: blue;
+}
+
 svg.redPiece {
   fill: red;
   stroke: white;

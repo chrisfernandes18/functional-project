@@ -168,7 +168,7 @@ boardToHTML b =
 view : Model -> Html Msg
 view model =
     case model of
-        M (C (Board b (BS cs pr mx my)) p1 p2 moves cp ct) p ->
+        M (C (Board b (BS cs pr mx my)) p1 p2 cp moves ct) p ->
             let
                 everything =
                     Debug.toString model
@@ -177,7 +177,7 @@ view model =
                     Debug.toString p
 
                 refStr =
-                    Debug.toString (boardRef (C (Board b (BS cs pr mx my)) p1 p2 moves cp ct) (physicalToLogical (PL p.x p.y) (BS cs pr mx my)))
+                    Debug.toString (boardRef (C (Board b (BS cs pr mx my)) p1 p2 cp moves ct) (physicalToLogical (PL p.x p.y) (BS cs pr mx my)))
 
                 logicalStr =
                     Debug.toString (physicalToLogical (PL p.x p.y) (BS cs pr mx my))
@@ -197,13 +197,13 @@ view model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model, msg ) of
-        ( M (C (Board b bs) p1 p2 moves cp ct) _, Click p ) ->
+        ( M (C (Board b bs) p1 p2 cp moves ct) _, Click p ) ->
             let
                 pl =
                     physicalToLogical (PL p.x p.y) bs
 
                 nt =
-                    case boardRef (C (Board b bs) p1 p2 moves cp ct) pl of
+                    case boardRef (C (Board b bs) p1 p2 cp moves ct) pl of
                         E ->
                             Nothing
 
@@ -227,26 +227,45 @@ update msg model =
                             t
             in
             if equalTiles newTile curTile then
-                ( M (C (Board b bs) p1 p2 moves cp Nothing) p, Cmd.none )
+                ( M (C (Board b bs) p1 p2 cp moves Nothing) p, Cmd.none )
 
             else
-                case ct of
-                    Nothing ->
-                        ( M (C (Board b bs) p1 p2 moves cp nt) p, Cmd.none )
+                case newTile of
+                    Piece color _ _ ->
+                        if equalColors color cp then
+                            case ct of
+                                Nothing ->
+                                    ( M (C (Board b bs) p1 p2 cp moves nt) p, Cmd.none )
 
-                    _ ->
-                        case movePiece (C (Board b bs) p1 p2 moves cp ct) pl curTile of
+                                _ ->
+                                    case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
+                                        Nothing ->
+                                            ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
+
+                                        Just newC ->
+                                            ( M newC p, Cmd.none )
+
+                        else
+                            ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
+
+                    E ->
+                        case ct of
                             Nothing ->
-                                ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
+                                ( M (C (Board b bs) p1 p2 cp moves nt) p, Cmd.none )
 
-                            Just newC ->
-                                ( M newC p, Cmd.none )
+                            _ ->
+                                case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
+                                    Nothing ->
+                                        ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
 
-        ( M (C (Board b (BS cs pr _ _)) p1 p2 moves cp ct) p, Offset (x :: y :: _) ) ->
-            ( M (C (Board b (BS cs pr x y)) p1 p2 moves cp ct) p, Cmd.none )
+                                    Just newC ->
+                                        ( M newC p, Cmd.none )
 
-        ( M (C (Board b bs) p1 p2 moves cp ct) p, _ ) ->
-            ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
+        ( M (C (Board b (BS cs pr _ _)) p1 p2 cp moves ct) p, Offset (x :: y :: _) ) ->
+            ( M (C (Board b (BS cs pr x y)) p1 p2 cp moves ct) p, Cmd.none )
+
+        ( M (C (Board b bs) p1 p2 cp moves ct) p, _ ) ->
+            ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

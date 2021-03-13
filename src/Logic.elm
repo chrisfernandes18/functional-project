@@ -1,5 +1,7 @@
 module Logic exposing
     ( boardRef
+    , changeColor
+    , equalColors
     , equalTiles
     , logicalToPhysical
     , movePiece
@@ -14,6 +16,19 @@ import Structs exposing (..)
 
 
 {-------------------------- Helper Functions --------------------------}
+
+
+equalColors : Color -> Color -> Bool
+equalColors c1 c2 =
+    case ( c1, c2 ) of
+        ( B, B ) ->
+            True
+
+        ( R, R ) ->
+            True
+
+        _ ->
+            False
 
 
 equalTiles : Tile -> Tile -> Bool
@@ -39,6 +54,16 @@ equalTiles t1 t2 =
 
         _ ->
             False
+
+
+changeColor : Color -> Color
+changeColor col =
+    case col of
+        B ->
+            R
+
+        R ->
+            B
 
 
 newTile : Maybe Color -> Int -> Int -> Tile
@@ -383,7 +408,7 @@ movePiece c (LL newRow newCol) t =
     -- nothing
     if legalMove c (LL newRow newCol) t then
         case ( c, t ) of
-            ( C (Board b bs) p1 p2 moves cp _, Piece _ (LL curRow curCol) move ) ->
+            ( C (Board b bs) p1 p2 cp moves _, Piece _ (LL curRow curCol) move ) ->
                 let
                     -- will king the piece if it's a king
                     newPiece =
@@ -452,10 +477,10 @@ movePiece c (LL newRow newCol) t =
                         board =
                             Array.set takeRow takeBoardCol newBoardFinal
                     in
-                    Just (C (Board board bs) p1 p2 moves cp Nothing)
+                    Just (C (Board board bs) p1 p2 (changeColor cp) moves Nothing)
 
                 else
-                    Just (C (Board newBoardFinal bs) p1 p2 moves cp Nothing)
+                    Just (C (Board newBoardFinal bs) p1 p2 (changeColor cp) moves Nothing)
 
             _ ->
                 Nothing

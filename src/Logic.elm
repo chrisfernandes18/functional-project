@@ -1,5 +1,6 @@
 module Logic exposing
     ( boardRef
+    , checkCapture
     , legalMove
     , logicalToPhysical
     , movePiece
@@ -153,10 +154,10 @@ checkCapture c m (LL curRow curCol) (LL newRow newCol) =
                         boardRef c
                             (LL (curRow + 1)
                                 (if dif < 0 then
-                                    curCol - 1
+                                    curCol + 1
 
                                  else
-                                    curCol + 1
+                                    curCol - 1
                                 )
                             )
 
@@ -189,10 +190,10 @@ checkCapture c m (LL curRow curCol) (LL newRow newCol) =
                         boardRef c
                             (LL (curRow - 1)
                                 (if dif < 0 then
-                                    curCol - 1
+                                    curCol + 1
 
                                  else
-                                    curCol + 1
+                                    curCol - 1
                                 )
                             )
 
@@ -223,25 +224,19 @@ checkCapture c m (LL curRow curCol) (LL newRow newCol) =
                 decOk =
                     (newRow < curRow) && (curRow - 2) == newRow
             in
-            if incOk && decOk then
+            if incOk || decOk then
                 let
                     dif =
                         curCol - newCol
 
                     tile =
                         boardRef c
-                            (LL
-                                (if newRow > curRow then
-                                    curRow + 1
-
-                                 else
-                                    curRow - 1
-                                )
+                            (LL (curRow + 1)
                                 (if dif < 0 then
-                                    curCol - 1
+                                    curCol + 1
 
                                  else
-                                    curCol + 1
+                                    curCol - 1
                                 )
                             )
 
@@ -337,7 +332,7 @@ physicalToLogical pl bs =
     -- data structures
     case ( pl, bs ) of
         ( PL x y, BS cs _ mx my ) ->
-            LL (round ((y - my) / cs)) (round ((x - mx) / cs))
+            LL (floor ((y - my) / cs)) (floor ((x - mx) / cs))
 
 
 boardRef : Checkers -> LogicalLoc -> Tile
@@ -365,26 +360,31 @@ legalMove : Checkers -> LogicalLoc -> Tile -> Bool
 legalMove c (LL newRow newCol) t =
     -- Given a board and a new location and the current
     -- piece that is selected returns if that piece can move
-    case ( c, t ) of
-        ( C b p1 p2 moves cp ct, E ) ->
+    case boardRef c (LL newRow newCol) of
+        E ->
+            case ( c, t ) of
+                ( C b p1 p2 moves cp ct, E ) ->
+                    False
+
+                ( C b p1 p2 moves cp ct, Piece _ (LL curRow curCol) move ) ->
+                    let
+                        cap =
+                            checkCapture c move (LL curRow curCol) (LL newRow newCol)
+
+                        dir =
+                            checkDirection move (LL curRow curCol) (LL newRow newCol)
+
+                        bounds =
+                            withinBounds (LL newRow newCol)
+                    in
+                    if cap == False then
+                        (dir == True) && (bounds == True)
+
+                    else
+                        bounds == True
+
+        _ ->
             False
-
-        ( C b p1 p2 moves cp ct, Piece _ (LL curRow curCol) move ) ->
-            let
-                cap =
-                    checkCapture c move (LL curRow curCol) (LL newRow newCol)
-
-                dir =
-                    checkDirection move (LL curRow curCol) (LL newRow newCol)
-
-                bounds =
-                    withinBounds (LL newRow newCol)
-            in
-            if cap == False then
-                (dir == True) && (bounds == True)
-
-            else
-                bounds == True
 
 
 movePiece : Checkers -> LogicalLoc -> Tile -> Maybe Checkers
@@ -444,10 +444,10 @@ movePiece c (LL newRow newCol) t =
 
                         takeCol =
                             if dif < 0 then
-                                curCol - 1
+                                curCol + 1
 
                             else
-                                curCol + 1
+                                curCol - 1
 
                         takeBoardRow =
                             case Array.get takeRow newBoardFinal of
@@ -463,10 +463,10 @@ movePiece c (LL newRow newCol) t =
                         board =
                             Array.set takeRow takeBoardCol newBoardFinal
                     in
-                    Just (C (Board board bs) p1 p2 moves cp ct)
+                    Just (C (Board board bs) p1 p2 moves cp Nothing)
 
                 else
-                    Just (C (Board newBoardFinal bs) p1 p2 moves cp ct)
+                    Just (C (Board newBoardFinal bs) p1 p2 moves cp Nothing)
 
             _ ->
                 Nothing

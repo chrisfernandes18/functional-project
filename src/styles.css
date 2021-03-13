@@ -1,6 +1,16 @@
+
+table {
+  border: 0px;
+  border-spacing: 0px;
+}
+tr {
+  width: 560px;
+  height: 70;
+}
 td {
   background-color: tan;
   text-align: center;
+  padding: 0px;
 }
 
 td.noPiece {
@@ -10,9 +20,11 @@ td.noPiece {
 svg.redPiece {
   fill: red;
   stroke: white;
+  display: block;
 }
 
 svg.blackPiece {
   fill: black;
   stroke: white;
+  display: block;
 }

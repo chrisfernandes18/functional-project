@@ -105,72 +105,59 @@ boardToHTML b =
                                 evenRow =
                                     modBy 2 row == 0
                             in
-                            if row == 3 || row == 4 then
-                                Array.indexedMap
-                                    (\col _ ->
-                                        let
-                                            evenCol =
-                                                modBy 2 col == 0
-                                        in
-                                        if (evenRow && evenCol) || (not evenRow && not evenCol) then
-                                            Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
+                            Array.indexedMap
+                                (\col tile ->
+                                    let
+                                        evenCol =
+                                            modBy 2 col == 0
+                                    in
+                                    case tile of
+                                        E ->
+                                            if (evenRow && evenCol) || (not evenRow && not evenCol) then
+                                                Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
 
-                                        else
-                                            Html.td [ hheight, hwidth ] []
-                                    )
-                                    rowArr
+                                            else
+                                                Html.td [ hheight, hwidth ] []
 
-                            else if row < 3 then
-                                Array.indexedMap
-                                    (\col _ ->
-                                        let
-                                            evenCol =
-                                                modBy 2 col == 0
-                                        in
-                                        if (evenRow && evenCol) || (not evenRow && not evenCol) then
-                                            Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
+                                        Piece color (LL currcol currow) _ ->
+                                            case color of
+                                                B ->
+                                                    if (evenRow && evenCol) || (not evenRow && not evenCol) then
+                                                        Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
 
-                                        else
-                                            Html.td
-                                                [ hheight, hwidth ]
-                                                [ svg
-                                                    [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPiece" ]
-                                                    [ circle
-                                                        [ SAttrs.cx (String.fromFloat (cs / 2.0))
-                                                        , SAttrs.cy (String.fromFloat (cs / 2.0))
-                                                        , SAttrs.r (String.fromFloat pr)
-                                                        ]
-                                                        []
-                                                    ]
-                                                ]
-                                    )
-                                    rowArr
+                                                    else
+                                                        Html.td
+                                                            [ hheight, hwidth ]
+                                                            [ svg
+                                                                [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPiece" ]
+                                                                [ circle
+                                                                    [ SAttrs.cx (String.fromFloat (cs / 2.0))
+                                                                    , SAttrs.cy (String.fromFloat (cs / 2.0))
+                                                                    , SAttrs.r (String.fromFloat pr)
+                                                                    ]
+                                                                    []
+                                                                ]
+                                                            ]
 
-                            else
-                                Array.indexedMap
-                                    (\col _ ->
-                                        let
-                                            evenCol =
-                                                modBy 2 col == 0
-                                        in
-                                        if (evenRow && evenCol) || (not evenRow && not evenCol) then
-                                            Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
+                                                R ->
+                                                    if (evenRow && evenCol) || (not evenRow && not evenCol) then
+                                                        Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
 
-                                        else
-                                            Html.td
-                                                [ hheight, hwidth ]
-                                                [ svg
-                                                    [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPiece" ]
-                                                    [ circle
-                                                        [ SAttrs.cx (String.fromFloat (cs / 2))
-                                                        , SAttrs.cy (String.fromFloat (cs / 2))
-                                                        , SAttrs.r (String.fromFloat pr)
-                                                        ]
-                                                        []
-                                                    ]
-                                                ]
-                                    )
-                                    rowArr
+                                                    else
+                                                        Html.td
+                                                            [ hheight, hwidth ]
+                                                            [ svg
+                                                                [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPiece" ]
+                                                                [ circle
+                                                                    [ SAttrs.cx (String.fromFloat (cs / 2.0))
+                                                                    , SAttrs.cy (String.fromFloat (cs / 2.0))
+                                                                    , SAttrs.r (String.fromFloat pr)
+                                                                    ]
+                                                                    []
+                                                                ]
+                                                            ]
+                                )
+                                rowArr
                         )
                         arr
 
@@ -183,26 +170,29 @@ boardToHTML b =
 view : Model -> Html Msg
 view model =
     case model of
-        M (C (Board b bs) p1 p2 moves cp ct) p ->
+        M (C (Board b (BS cs pr mx my)) p1 p2 moves cp ct) p ->
             let
-                boardStr =
-                    Debug.toString b
+                everything =
+                    Debug.toString model
 
                 pointStr =
                     Debug.toString p
 
                 refStr =
-                    Debug.toString (boardRef (C (Board b bs) p1 p2 moves cp ct) (physicalToLogical (PL p.x p.y) bs))
+                    Debug.toString (boardRef (C (Board b (BS cs pr mx my)) p1 p2 moves cp ct) (physicalToLogical (PL p.x p.y) (BS cs pr mx my)))
 
                 logicalStr =
-                    Debug.toString (physicalToLogical (PL p.x p.y) bs)
+                    Debug.toString (physicalToLogical (PL p.x p.y) (BS cs pr mx my))
+
+                margins =
+                    Debug.toString mx ++ " " ++ Debug.toString my
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
-                [ Html.text boardStr
+                [ Html.text everything
                 , Html.div
                     []
-                    [ boardToHTML (Board b bs), Html.text pointStr, Html.text logicalStr, Html.text refStr ]
+                    [ boardToHTML (Board b (BS cs pr mx my)), Html.text pointStr, Html.text logicalStr, Html.text refStr, Html.text margins ]
                 ]
 
 
@@ -213,7 +203,37 @@ update msg model =
             ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
 
         ( M (C (Board b bs) p1 p2 moves cp ct) _, Click p ) ->
-            ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
+            let
+                pl =
+                    physicalToLogical (PL p.x p.y) bs
+
+                ref =
+                    case boardRef (C (Board b bs) p1 p2 moves cp ct) pl of
+                        E ->
+                            Nothing
+
+                        Piece c l m ->
+                            Just (Piece c l m)
+
+                curTile =
+                    case ct of
+                        Nothing ->
+                            E
+
+                        Just t ->
+                            t
+            in
+            case ct of
+                Nothing ->
+                    ( M (C (Board b bs) p1 p2 moves cp ref) p, Cmd.none )
+
+                _ ->
+                    case movePiece (C (Board b bs) p1 p2 moves cp ct) pl curTile of
+                        Nothing ->
+                            ( M (C (Board b bs) p1 p2 moves cp ct) p, Cmd.none )
+
+                        Just newC ->
+                            ( M newC p, Cmd.none )
 
         ( M (C (Board b (BS cs pr _ _)) p1 p2 moves cp ct) p, Offset (x :: y :: _) ) ->
             ( M (C (Board b (BS cs pr x y)) p1 p2 moves cp ct) p, Cmd.none )

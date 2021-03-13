@@ -120,43 +120,75 @@ boardToHTML b =
                                             else
                                                 Html.td [ hheight, hwidth ] []
 
-                                        Piece color (LL _ _) _ ->
+                                        Piece color (LL _ _) move ->
                                             case color of
                                                 B ->
                                                     if (evenRow && evenCol) || (not evenRow && not evenCol) then
                                                         Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
 
                                                     else
-                                                        Html.td
-                                                            [ hheight, hwidth ]
-                                                            [ svg
-                                                                [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPiece" ]
-                                                                [ circle
-                                                                    [ SAttrs.cx (String.fromFloat (cs / 2.0))
-                                                                    , SAttrs.cy (String.fromFloat (cs / 2.0))
-                                                                    , SAttrs.r (String.fromFloat pr)
+                                                        case move of
+                                                            Both ->
+                                                                Html.td
+                                                                    [ hheight, hwidth ]
+                                                                    [ svg
+                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPieceKing" ]
+                                                                        [ circle
+                                                                            [ SAttrs.cx (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.cy (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.r (String.fromFloat pr)
+                                                                            ]
+                                                                            []
+                                                                        ]
                                                                     ]
-                                                                    []
-                                                                ]
-                                                            ]
+
+                                                            _ ->
+                                                                Html.td
+                                                                    [ hheight, hwidth ]
+                                                                    [ svg
+                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "blackPiece" ]
+                                                                        [ circle
+                                                                            [ SAttrs.cx (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.cy (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.r (String.fromFloat pr)
+                                                                            ]
+                                                                            []
+                                                                        ]
+                                                                    ]
 
                                                 R ->
                                                     if (evenRow && evenCol) || (not evenRow && not evenCol) then
                                                         Html.td [ HAttrs.class "noPiece", hheight, hwidth ] []
 
                                                     else
-                                                        Html.td
-                                                            [ hheight, hwidth ]
-                                                            [ svg
-                                                                [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPiece" ]
-                                                                [ circle
-                                                                    [ SAttrs.cx (String.fromFloat (cs / 2.0))
-                                                                    , SAttrs.cy (String.fromFloat (cs / 2.0))
-                                                                    , SAttrs.r (String.fromFloat pr)
+                                                        case move of
+                                                            Both ->
+                                                                Html.td
+                                                                    [ hheight, hwidth ]
+                                                                    [ svg
+                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPieceKing" ]
+                                                                        [ circle
+                                                                            [ SAttrs.cx (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.cy (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.r (String.fromFloat pr)
+                                                                            ]
+                                                                            []
+                                                                        ]
                                                                     ]
-                                                                    []
-                                                                ]
-                                                            ]
+
+                                                            _ ->
+                                                                Html.td
+                                                                    [ hheight, hwidth ]
+                                                                    [ svg
+                                                                        [ swidth, sheight, SAttrs.viewBox ("0 0 " ++ String.fromFloat cs ++ " " ++ String.fromFloat cs), SAttrs.class "redPiece" ]
+                                                                        [ circle
+                                                                            [ SAttrs.cx (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.cy (String.fromFloat (cs / 2.0))
+                                                                            , SAttrs.r (String.fromFloat pr)
+                                                                            ]
+                                                                            []
+                                                                        ]
+                                                                    ]
                                 )
                                 rowArr
                         )

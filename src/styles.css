@@ -22,9 +22,23 @@ svg.redPiece {
   display: block;
 }
 
+svg.redPieceKing {
+  fill: red;
+  stroke-width: 3px;
+  stroke: goldenrod;
+  display: block;
+}
+
 svg.blackPiece {
   fill: black;
   stroke: white;
+  display: block;
+}
+
+svg.blackPieceKing {
+  fill: black;
+  stroke-width: 3px;
+  stroke: goldenrod;
   display: block;
 }
 

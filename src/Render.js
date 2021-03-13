@@ -6797,88 +6797,167 @@ var $author$project$Render$boardToHTML = function (b) {
 							} else {
 								var color = tile.a;
 								var _v3 = tile.b;
+								var move = tile.c;
 								if (color.$ === 'B') {
-									return ((evenRow && evenCol) || ((!evenRow) && (!evenCol))) ? A2(
-										$elm$html$Html$td,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('noPiece'),
-												hheight,
-												hwidth
-											]),
-										_List_Nil) : A2(
-										$elm$html$Html$td,
-										_List_fromArray(
-											[hheight, hwidth]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$svg$Svg$svg,
+									if ((evenRow && evenCol) || ((!evenRow) && (!evenCol))) {
+										return A2(
+											$elm$html$Html$td,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('noPiece'),
+													hheight,
+													hwidth
+												]),
+											_List_Nil);
+									} else {
+										if (move.$ === 'Both') {
+											return A2(
+												$elm$html$Html$td,
 												_List_fromArray(
-													[
-														swidth,
-														sheight,
-														$elm$svg$Svg$Attributes$viewBox(
-														'0 0 ' + ($elm$core$String$fromFloat(cs) + (' ' + $elm$core$String$fromFloat(cs)))),
-														$elm$svg$Svg$Attributes$class('blackPiece')
-													]),
+													[hheight, hwidth]),
 												_List_fromArray(
 													[
 														A2(
-														$elm$svg$Svg$circle,
+														$elm$svg$Svg$svg,
 														_List_fromArray(
 															[
-																$elm$svg$Svg$Attributes$cx(
-																$elm$core$String$fromFloat(cs / 2.0)),
-																$elm$svg$Svg$Attributes$cy(
-																$elm$core$String$fromFloat(cs / 2.0)),
-																$elm$svg$Svg$Attributes$r(
-																$elm$core$String$fromFloat(pr))
+																swidth,
+																sheight,
+																$elm$svg$Svg$Attributes$viewBox(
+																'0 0 ' + ($elm$core$String$fromFloat(cs) + (' ' + $elm$core$String$fromFloat(cs)))),
+																$elm$svg$Svg$Attributes$class('blackPieceKing')
 															]),
-														_List_Nil)
-													]))
-											]));
+														_List_fromArray(
+															[
+																A2(
+																$elm$svg$Svg$circle,
+																_List_fromArray(
+																	[
+																		$elm$svg$Svg$Attributes$cx(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$cy(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$r(
+																		$elm$core$String$fromFloat(pr))
+																	]),
+																_List_Nil)
+															]))
+													]));
+										} else {
+											return A2(
+												$elm$html$Html$td,
+												_List_fromArray(
+													[hheight, hwidth]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$svg$Svg$svg,
+														_List_fromArray(
+															[
+																swidth,
+																sheight,
+																$elm$svg$Svg$Attributes$viewBox(
+																'0 0 ' + ($elm$core$String$fromFloat(cs) + (' ' + $elm$core$String$fromFloat(cs)))),
+																$elm$svg$Svg$Attributes$class('blackPiece')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$svg$Svg$circle,
+																_List_fromArray(
+																	[
+																		$elm$svg$Svg$Attributes$cx(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$cy(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$r(
+																		$elm$core$String$fromFloat(pr))
+																	]),
+																_List_Nil)
+															]))
+													]));
+										}
+									}
 								} else {
-									return ((evenRow && evenCol) || ((!evenRow) && (!evenCol))) ? A2(
-										$elm$html$Html$td,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('noPiece'),
-												hheight,
-												hwidth
-											]),
-										_List_Nil) : A2(
-										$elm$html$Html$td,
-										_List_fromArray(
-											[hheight, hwidth]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$svg$Svg$svg,
+									if ((evenRow && evenCol) || ((!evenRow) && (!evenCol))) {
+										return A2(
+											$elm$html$Html$td,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('noPiece'),
+													hheight,
+													hwidth
+												]),
+											_List_Nil);
+									} else {
+										if (move.$ === 'Both') {
+											return A2(
+												$elm$html$Html$td,
 												_List_fromArray(
-													[
-														swidth,
-														sheight,
-														$elm$svg$Svg$Attributes$viewBox(
-														'0 0 ' + ($elm$core$String$fromFloat(cs) + (' ' + $elm$core$String$fromFloat(cs)))),
-														$elm$svg$Svg$Attributes$class('redPiece')
-													]),
+													[hheight, hwidth]),
 												_List_fromArray(
 													[
 														A2(
-														$elm$svg$Svg$circle,
+														$elm$svg$Svg$svg,
 														_List_fromArray(
 															[
-																$elm$svg$Svg$Attributes$cx(
-																$elm$core$String$fromFloat(cs / 2.0)),
-																$elm$svg$Svg$Attributes$cy(
-																$elm$core$String$fromFloat(cs / 2.0)),
-																$elm$svg$Svg$Attributes$r(
-																$elm$core$String$fromFloat(pr))
+																swidth,
+																sheight,
+																$elm$svg$Svg$Attributes$viewBox(
+																'0 0 ' + ($elm$core$String$fromFloat(cs) + (' ' + $elm$core$String$fromFloat(cs)))),
+																$elm$svg$Svg$Attributes$class('redPieceKing')
 															]),
-														_List_Nil)
-													]))
-											]));
+														_List_fromArray(
+															[
+																A2(
+																$elm$svg$Svg$circle,
+																_List_fromArray(
+																	[
+																		$elm$svg$Svg$Attributes$cx(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$cy(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$r(
+																		$elm$core$String$fromFloat(pr))
+																	]),
+																_List_Nil)
+															]))
+													]));
+										} else {
+											return A2(
+												$elm$html$Html$td,
+												_List_fromArray(
+													[hheight, hwidth]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$svg$Svg$svg,
+														_List_fromArray(
+															[
+																swidth,
+																sheight,
+																$elm$svg$Svg$Attributes$viewBox(
+																'0 0 ' + ($elm$core$String$fromFloat(cs) + (' ' + $elm$core$String$fromFloat(cs)))),
+																$elm$svg$Svg$Attributes$class('redPiece')
+															]),
+														_List_fromArray(
+															[
+																A2(
+																$elm$svg$Svg$circle,
+																_List_fromArray(
+																	[
+																		$elm$svg$Svg$Attributes$cx(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$cy(
+																		$elm$core$String$fromFloat(cs / 2.0)),
+																		$elm$svg$Svg$Attributes$r(
+																		$elm$core$String$fromFloat(pr))
+																	]),
+																_List_Nil)
+															]))
+													]));
+										}
+									}
 								}
 							}
 						}),

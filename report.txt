@@ -1,0 +1,45 @@
+For this project we decided on doing checkers in the end. We first tried to implement
+Pac-Man but we really struggled with trying to get the visualization of Pac-Man
+in the web so we decided to go with checkers since it was much simpler to deal with 
+visualization and then we could add more features to it than we could for Pac-Man.
+
+To begin, we started with the implementation of the game logic and data structures to
+use that would represent the game internally, for a basica Human v Human version of 
+checkers. This didn't take too long since the logic of the pieces are all the same
+either moving diagonally down or up the board or if a king either direction, and then
+distinguishing between whose piece is whose, and if we were moving regularly or capturing
+a piece. Finally determining if it was the end of a game or not. Our board was a 2D 
+Array data structure of Tiles which were either empty or a piece with its logilal location
+in the Array structure, its color, and whether it was a king or not. Then there was the
+option of having two players or two bots since we want to be able to implement that, which
+player's turn it currently is, the number of current moves, and then also if a Tile is
+currently selected or not. Then we started making our rendering functions for the model
+that elm does to render in the web.
+
+We used the init, view, update, and subscriptions model. This is where we started actually
+having a lot of issues. We added an area to the board that would take in sizing for the
+pieces, the spots on the board, and the offset of the window size so we could accurately
+read the clicks of the user and determine where in the Array we were looking. To get the 
+offset of the table html tag we had to make port functions that would give us the offset.
+The only issue was when we were rendering our index.html file in elm repl it would not
+take into account the style changes for padding and was creating extra padding that we didn't
+need that would mess up the clicking and where in the Array board we were. This was an issue
+for so long until we stopped using elm repl and just opened the index file and then it was
+able to see the changed to style that we wanted. After that we did a lot of visual testing
+to make sure our game logic was actually correct and found some issues with the movement that
+we fixed. Then we added more visual features to it to make it so we could distinguish pieces
+selected, if a piece is a king, etc.
+
+ANGELA AND THE ADDITIONAL FEATURES
+
+Overall, we struggled with trying to use some of the elm functions like HTML.events.getElement
+which we wanted to use to try to get the offset of the table elment instead of using a port, because
+we didn't get some of the types that were being used and it was confusing. Another thing was when we
+switched to using ports, we would get type errors such as I wanted to get the x-offset of the table
+as an Int, but since JavaScript has numbers I kept getting type errors even when I tried to make it a
+number in elm, but it was not liking that, until I just made it a list of to get both the y and x
+offset. That was not that fun to deal with the type differences with JavaScript. I think it would help
+if elm had pretty good examples of using their functions for the HTML stuff, and not just one but a few
+to see how people actually use it, because deciphering the types sometimes is confusing.
+
+ANGELA AND ISSUES WITh ELM TOO

@@ -297,6 +297,13 @@ view model =
                 ]
 
 
+-- given a maybe tile, returns a tile
+unwrapTile : Maybe Tile -> Tile 
+unwrapTile mt = 
+    case mt of 
+        Nothing -> E
+        Just t -> t 
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model, msg ) of
@@ -316,21 +323,9 @@ update msg model =
                         Piece c l m ->
                             Just (Piece c l m)
 
-                newTile =
-                    case nt of
-                        Nothing ->
-                            E
+                newTile = unwrapTile nt
 
-                        Just t ->
-                            t
-
-                curTile =
-                    case ct of
-                        Nothing ->
-                            E
-
-                        Just t ->
-                            t
+                curTile = unwrapTile ct
             in
             if equalTiles newTile curTile then
                 ( M (C (Board b bs) p1 p2 cp moves Nothing) p, Cmd.none )
@@ -349,7 +344,7 @@ update msg model =
                                             ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
 
                                         Just newC ->
-                                            ( M newC p, Cmd.none )
+                                            ( M newC p, Cmd.none ) -- update message here to check if end game
 
                         else
                             ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
@@ -365,7 +360,7 @@ update msg model =
                                         ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
 
                                     Just newC ->
-                                        ( M newC p, Cmd.none )
+                                        ( M newC p, Cmd.none ) -- update message here to check if end game
 
         ( M (C (Board b (BS cs pr _ _)) p1 p2 cp moves ct) p, Offset (x :: y :: _) ) ->
             ( M (C (Board b (BS cs pr x y)) p1 p2 cp moves ct) p, Cmd.none )

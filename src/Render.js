@@ -7465,6 +7465,7 @@ var $author$project$Render$boardToHTML = F2(
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -7531,7 +7532,7 @@ var $author$project$Render$view = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$div,
+				$elm$html$Html$h1,
 				_List_fromArray(
 					[
 						A2($elm$html$Html$Attributes$style, 'font-size', '50px')

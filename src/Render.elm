@@ -294,7 +294,7 @@ view model =
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
-                [ Html.div
+                [ Html.h1
                     [ HAttrs.style "font-size" "50px" ]
                     [ Html.text endText ]
                 , Html.div

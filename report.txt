@@ -30,7 +30,17 @@ to make sure our game logic was actually correct and found some issues with the 
 we fixed. Then we added more visual features to it to make it so we could distinguish pieces
 selected, if a piece is a king, etc.
 
-ANGELA AND THE ADDITIONAL FEATURES
+Lastly, some other features we implemented after the basic logic and clicking was set up. 
+First was an indication of whether the game was over. Since the board was kept as a 2D 
+array, funcionsw ere written to search over the board for one of two endgame situations: 
+the current player has no pieces left, or no pieces to move. The first was simple to implement,
+while the second took a bit more logic to search over potential moves. However, after implementing
+logic for possible moves given a board position, it was relatively easy to implement the bot 
+playmode. The bot's logic takes in all of the possible moves, and selects one to make. However,
+the most difficult part of implementing the bot was not actually the logic, but the selector for
+game mode. More details on the difficulties with Http inputs is outlined below; in the end,
+the game mode was updated with messages to update the model's player1 and player2 state. If 
+a player is a bot, the board state automatically updates with every click.
 
 Overall, we struggled with trying to use some of the elm functions like HTML.events.getElement
 which we wanted to use to try to get the offset of the table elment instead of using a port, because
@@ -42,4 +52,9 @@ offset. That was not that fun to deal with the type differences with JavaScript.
 if elm had pretty good examples of using their functions for the HTML stuff, and not just one but a few
 to see how people actually use it, because deciphering the types sometimes is confusing.
 
-ANGELA AND ISSUES WITh ELM TOO
+It was difficult to get inputs from forms and selectors, as examples found on the internet typically
+relied on a Http request model. In addition, many resources found online were of past Html/Http 
+packages in elm (such as from 1.0.0), which made it difficult to translate to the version of 
+elm we were using. The Http elm manual page was a bit confusing to decipher, so after some failed 
+attempts of requesting information about player names from forms, we opted to go with a simple 
+drop-down selector. This immediately made the model much easier to update. 

@@ -27,9 +27,9 @@ svg.redPiece {
 }
 
 svg.redPieceKing {
-  fill: red;
+  fill: goldenrod;
   stroke-width: 3px;
-  stroke: goldenrod;
+  stroke: red;
   display: block;
 }
 
@@ -40,9 +40,9 @@ svg.blackPiece {
 }
 
 svg.blackPieceKing {
-  fill: black;
+  fill: goldenrod;
   stroke-width: 3px;
-  stroke: goldenrod;
+  stroke: black;
   display: block;
 }
 

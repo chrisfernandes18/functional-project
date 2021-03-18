@@ -9,6 +9,7 @@ module Logic exposing
     , testCheckers
     , testEndGame
     , testEndGame2
+    , testEndGame3
     , testEndGameFalse
     , endGame
     )
@@ -613,6 +614,16 @@ testEndGame2 =
                 Array.fromList [E,E,E,E,Piece R (LL 5 4) Dec,E,Piece R (LL 5 6) Dec,E],
                 Array.fromList [E,E,E,E,E,Piece R (LL 6 5) Dec,E,E],Array.fromList [E,E,E,E,E,E,E,E]]) 
         (BS 70 30 360 98)) Nothing Nothing B 0 Nothing
+
+testEndGame3 : Checkers
+testEndGame3 = 
+    C (Board (Array.fromList 
+                [Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,E,Piece B (LL 1 4) Both,E,Piece B (LL 1 6) Inc,E],
+                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,E,E,E,E,E],
+                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,Piece B (LL 5 2) Inc,E,E,E,E,E],
+                Array.fromList [E,E,E,Piece B (LL 6 3) Inc,E,Piece B (LL 6 5) Inc,E,E],
+                Array.fromList [E,E,E,E,Piece B (LL 7 4) Both,E,E,E]]) 
+            (BS 70 30 360 79)) Nothing Nothing R 0 Nothing
 
 -- false end game - move for black 
 testEndGameFalse : Checkers

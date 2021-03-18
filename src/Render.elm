@@ -36,6 +36,7 @@ type alias Model =
     , gameOver : Bool
     , player1 : Maybe Player
     , player2 : Maybe Player
+    , init : Bool
     }
 
 
@@ -45,6 +46,9 @@ type Msg
       -- | SubmitForm
     | UpdatePlayer1 String
     | UpdatePlayer2 String
+    | UpdatePlayer1Name String
+    | UpdatePlayer2Name String
+    | Submit
 
 
 type alias Flags =
@@ -91,11 +95,12 @@ init () =
 
 initModel : Model
 initModel =
-    { checkers = C (Board (newBoard 8) (BS 10 70 30 10 10)) Nothing Nothing B 0 Nothing
+    { checkers = C (Board (newBoard 8) (BS 10 70 30 10 10)) B 0 Nothing
     , point = { x = 0, y = 0 }
     , gameOver = False
     , player1 = Just (Human "" B)
     , player2 = Just (Human "" R)
+    , init = True
     }
 
 
@@ -276,8 +281,11 @@ boardToHTML b til =
 view : Model -> Html Msg
 view model =
     case ( model.checkers, model.point ) of
-        ( C (Board b (BS bords cs pr mx my)) _ _ cp _ ct, _ ) ->
+        ( C (Board b (BS bords cs pr mx my)) cp moves ct, _ ) ->
             let
+                {- every =
+                   Debug.toString model
+                -}
                 endText =
                     if model.gameOver then
                         "Game over: "
@@ -294,26 +302,85 @@ view model =
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
-                [ Html.h1
+                [ {- Html.text every, -}
+                  Html.h1
                     [ HAttrs.style "font-size" "50px" ]
                     [ Html.text endText ]
                 , Html.div
                     []
                     [ boardToHTML (Board b (BS bords cs pr mx my)) ct ]
-                , Html.form
-                    [ HAttrs.id "players" ]
-                    [ Html.br [] []
-                    , Html.select
-                        [ HAttrs.id "choice1", HEvents.onInput UpdatePlayer1 ]
-                        [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
-                        , Html.option [ HAttrs.value "bot" ] [ Html.text "Bot" ]
+                , if model.init then
+                    Html.div
+                        []
+                        [ Html.br [] []
+                        , Html.b [ HAttrs.style "font-size" "35px" ] [ Html.text "Please fill out fields below." ]
+                        , Html.form
+                            [ HAttrs.id "players" ]
+                            [ Html.br [] []
+                            , Html.b [] [ Html.text "Player 1 : " ]
+                            , Html.select
+                                [ HAttrs.id "choice1", HEvents.onInput UpdatePlayer1 ]
+                                [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
+                                , Html.option [ HAttrs.value "bot" ] [ Html.text "Bot" ]
+                                ]
+                            , case model.player1 of
+                                Just (Human _ _) ->
+                                    Html.input
+                                        [ HAttrs.type_ "text", HAttrs.id "choice1Name", HAttrs.placeholder "Player 1's Name", HEvents.onInput UpdatePlayer1Name ]
+                                        []
+
+                                _ ->
+                                    Html.text ""
+                            , Html.br [] []
+                            , Html.b [] [ Html.text "Player 2 : " ]
+                            , Html.select
+                                [ HAttrs.id "choice2", HEvents.onInput UpdatePlayer2 ]
+                                [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
+                                , Html.option [ HAttrs.value "bot" ] [ Html.text "Bot" ]
+                                ]
+                            , case model.player2 of
+                                Just (Human _ _) ->
+                                    Html.input
+                                        [ HAttrs.type_ "text", HAttrs.id "choice2Name", HAttrs.placeholder "Player 2's Name", HEvents.onInput UpdatePlayer2Name ]
+                                        []
+
+                                _ ->
+                                    Html.text ""
+                            , Html.br [] []
+                            , Html.input
+                                [ HAttrs.type_ "button", HAttrs.value "Submit", HEvents.onClick Submit ]
+                                []
+                            ]
                         ]
-                    , Html.select
-                        [ HAttrs.id "choice2", HEvents.onInput UpdatePlayer2 ]
-                        [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
-                        , Html.option [ HAttrs.value "bot" ] [ Html.text "Bot" ]
+
+                  else
+                    Html.div
+                        [ HAttrs.style "font-size" "20px" ]
+                        [ Html.h2
+                            [ HAttrs.style "font-size" "35px" ]
+                            (if model.init then
+                                []
+
+                             else
+                                [ case ( model.player1, model.player2 ) of
+                                    ( Just (Robot name1 _), Just (Robot name2 _) ) ->
+                                        Html.text (name1 ++ " vs. " ++ name2)
+
+                                    ( Just (Human name1 _), Just (Robot name2 _) ) ->
+                                        Html.text (name1 ++ " vs. " ++ name2)
+
+                                    ( Just (Robot name1 _), Just (Human name2 _) ) ->
+                                        Html.text (name1 ++ " vs.  " ++ name2)
+
+                                    ( Just (Human name1 _), Just (Human name2 _) ) ->
+                                        Html.text (name1 ++ " vs. " ++ name2)
+
+                                    _ ->
+                                        Html.text ""
+                                ]
+                            )
+                        , Html.text ("Overall number of moves: " ++ Debug.toString moves)
                         ]
-                    ]
                 ]
 
 
@@ -352,20 +419,20 @@ wrapTile t =
 moveTo : Tile -> Model -> Msg -> Model
 moveTo nt model msg =
     case ( model.checkers, msg ) of
-        ( C (Board b bs) p1 p2 cp moves ct, Click p ) ->
+        ( C (Board b bs) cp moves ct, Click p ) ->
             let
                 pl =
                     physicalToLogical (PL p.x p.y) bs
 
                 unchanged =
                     { model
-                        | checkers = C (Board b bs) p1 p2 cp moves ct
+                        | checkers = C (Board b bs) cp moves ct
                         , point = p
                     }
 
                 ctToNt =
                     { model
-                        | checkers = C (Board b bs) p1 p2 cp moves (wrapTile nt)
+                        | checkers = C (Board b bs) cp moves (wrapTile nt)
                         , point = p
                     }
 
@@ -382,7 +449,7 @@ moveTo nt model msg =
 
                 ( Piece color _ _, _ ) ->
                     if equalColors color cp then
-                        case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
+                        case movePiece (C (Board b bs) cp moves ct) pl curTile of
                             Nothing ->
                                 unchanged
 
@@ -396,7 +463,7 @@ moveTo nt model msg =
                     ctToNt
 
                 ( E, _ ) ->
-                    case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
+                    case movePiece (C (Board b bs) cp moves ct) pl curTile of
                         Nothing ->
                             unchanged
 
@@ -414,7 +481,7 @@ moveTo nt model msg =
 updateBotMove : Model -> Model
 updateBotMove model =
     case model.checkers of
-        C _ _ _ B _ _ ->
+        C _ B _ _ ->
             if checkBot model.player1 then
                 case makeBotMove model.checkers of
                     Nothing ->
@@ -426,7 +493,7 @@ updateBotMove model =
             else
                 model
 
-        C _ _ _ R _ _ ->
+        C _ R _ _ ->
             if checkBot model.player2 then
                 case makeBotMove model.checkers of
                     Nothing ->
@@ -455,7 +522,7 @@ gameEnded model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model.checkers, model.point ) of
-        ( C (Board b (BS bords cs pr xOld yOld)) p1 p2 cp moves ct, p ) ->
+        ( C (Board b (BS bords cs pr xOld yOld)) cp moves ct, p ) ->
             case msg of
                 Click pNew ->
                     let
@@ -463,39 +530,88 @@ update msg model =
                             physicalToLogical (PL pNew.x pNew.y) (BS bords cs pr xOld yOld)
 
                         newTile =
-                            boardRef (C (Board b (BS bords cs pr xOld yOld)) p1 p2 cp moves ct) pl
+                            boardRef (C (Board b (BS bords cs pr xOld yOld)) cp moves ct) pl
 
                         curTile =
                             unwrapTile ct
                     in
                     if equalTiles newTile curTile then
                         ( { model
-                            | checkers = C (Board b (BS bords cs pr xOld yOld)) p1 p2 cp moves Nothing
+                            | checkers = C (Board b (BS bords cs pr xOld yOld)) cp moves Nothing
                             , point = pNew
                           }
                         , Cmd.none
                         )
 
                     else
-                        ( gameEnded (updateBotMove (moveTo newTile model msg)), Cmd.none )
+                        ( if model.init then
+                            model
+
+                          else
+                            gameEnded (updateBotMove (moveTo newTile model msg))
+                        , Cmd.none
+                        )
 
                 -- update if game ended after move
                 Offset (x :: y :: _) ->
                     ( { model
-                        | checkers = C (Board b (BS bords cs pr x y)) p1 p2 cp moves ct
+                        | checkers = C (Board b (BS bords cs pr x y)) cp moves ct
                         , point = p
                       }
                     , Cmd.none
                     )
 
                 UpdatePlayer1 p1s ->
-                    ( { model | player1 = playerStrToP p1s "" 1 }, Cmd.none )
+                    ( if model.init then
+                        { model | player1 = playerStrToP p1s "" 1 }
+
+                      else
+                        model
+                    , Cmd.none
+                    )
 
                 UpdatePlayer2 p2s ->
-                    ( { model | player2 = playerStrToP p2s "" 2 }, Cmd.none )
+                    ( if model.init then
+                        { model | player2 = playerStrToP p2s "" 2 }
+
+                      else
+                        model
+                    , Cmd.none
+                    )
+
+                UpdatePlayer1Name p1s ->
+                    ( if model.init then
+                        { model | player1 = playerName p1s model.player1 }
+
+                      else
+                        model
+                    , Cmd.none
+                    )
+
+                UpdatePlayer2Name p2s ->
+                    ( if model.init then
+                        { model | player2 = playerName p2s model.player2 }
+
+                      else
+                        model
+                    , Cmd.none
+                    )
+
+                Submit ->
+                    ( { model | init = False }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
+
+
+playerName : String -> Maybe Player -> Maybe Player
+playerName name player =
+    case player of
+        Just (Human _ col) ->
+            Just (Human name col)
+
+        _ ->
+            player
 
 
 
@@ -513,10 +629,10 @@ playerStrToP s name num =
             Just (Human name R)
 
         ( "bot", 1 ) ->
-            Just (Robot name B)
+            Just (Robot "Player 1 Robot" B)
 
         ( "bot", 2 ) ->
-            Just (Robot name R)
+            Just (Robot "Player 2 Robot" R)
 
         _ ->
             Nothing

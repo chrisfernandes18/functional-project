@@ -5190,9 +5190,9 @@ var $author$project$Structs$Board = F2(
 	function (a, b) {
 		return {$: 'Board', a: a, b: b};
 	});
-var $author$project$Structs$C = F6(
-	function (a, b, c, d, e, f) {
-		return {$: 'C', a: a, b: b, c: c, d: d, e: e, f: f};
+var $author$project$Structs$C = F4(
+	function (a, b, c, d) {
+		return {$: 'C', a: a, b: b, c: c, d: d};
 	});
 var $author$project$Structs$Human = F2(
 	function (a, b) {
@@ -5268,18 +5268,17 @@ var $author$project$Logic$newBoard = function (i) {
 	return res;
 };
 var $author$project$Render$initModel = {
-	checkers: A6(
+	checkers: A4(
 		$author$project$Structs$C,
 		A2(
 			$author$project$Structs$Board,
 			$author$project$Logic$newBoard(8),
 			A5($author$project$Structs$BS, 10, 70, 30, 10, 10)),
-		$elm$core$Maybe$Nothing,
-		$elm$core$Maybe$Nothing,
 		$author$project$Structs$B,
 		0,
 		$elm$core$Maybe$Nothing),
 	gameOver: false,
+	init: true,
 	player1: $elm$core$Maybe$Just(
 		A2($author$project$Structs$Human, '', $author$project$Structs$B)),
 	player2: $elm$core$Maybe$Just(
@@ -6511,7 +6510,7 @@ var $author$project$Logic$getPlayerTiles = F2(
 var $author$project$Logic$getAllLegalMoves = function (checkers) {
 	var _v1 = checkers.a;
 	var board = _v1.a;
-	var currPlayer = checkers.d;
+	var currPlayer = checkers.b;
 	var tiles = $elm$core$Array$toList(
 		A2($author$project$Logic$getPlayerTiles, board, currPlayer));
 	var moves = function (tile) {
@@ -6559,7 +6558,7 @@ var $elm$core$Basics$not = _Basics_not;
 var $author$project$Logic$endGame = function (checkers) {
 	var _v1 = checkers.a;
 	var board = _v1.a;
-	var currPlayer = checkers.d;
+	var currPlayer = checkers.b;
 	var currentPlayerTile = function (tile) {
 		return A2($author$project$Logic$tileGivenColor, tile, currPlayer);
 	};
@@ -6681,10 +6680,8 @@ var $author$project$Logic$movePiece = F3(
 				var _v3 = _v2.a;
 				var b = _v3.a;
 				var bs = _v3.b;
-				var p1 = _v2.b;
-				var p2 = _v2.c;
-				var cp = _v2.d;
-				var moves = _v2.e;
+				var cp = _v2.b;
+				var moves = _v2.c;
 				var _v4 = _v1.b;
 				var _v5 = _v4.b;
 				var curRow = _v5.a;
@@ -6737,21 +6734,17 @@ var $author$project$Logic$movePiece = F3(
 					var takeBoardCol = A3($elm$core$Array$set, takeCol, $author$project$Structs$E, takeBoardRow);
 					var board = A3($elm$core$Array$set, takeRow, takeBoardCol, newBoardFinal);
 					return $elm$core$Maybe$Just(
-						A6(
+						A4(
 							$author$project$Structs$C,
 							A2($author$project$Structs$Board, board, bs),
-							p1,
-							p2,
 							$author$project$Logic$changeColor(cp),
 							moves + 1,
 							$elm$core$Maybe$Nothing));
 				} else {
 					return $elm$core$Maybe$Just(
-						A6(
+						A4(
 							$author$project$Structs$C,
 							A2($author$project$Structs$Board, newBoardFinal, bs),
-							p1,
-							p2,
 							$author$project$Logic$changeColor(cp),
 							moves + 1,
 							$elm$core$Maybe$Nothing));
@@ -6806,20 +6799,16 @@ var $author$project$Render$moveTo = F3(
 			var _v2 = _v1.a;
 			var b = _v2.a;
 			var bs = _v2.b;
-			var p1 = _v1.b;
-			var p2 = _v1.c;
-			var cp = _v1.d;
-			var moves = _v1.e;
-			var ct = _v1.f;
+			var cp = _v1.b;
+			var moves = _v1.c;
+			var ct = _v1.d;
 			var p = _v0.b.a;
 			var unchanged = _Utils_update(
 				model,
 				{
-					checkers: A6(
+					checkers: A4(
 						$author$project$Structs$C,
 						A2($author$project$Structs$Board, b, bs),
-						p1,
-						p2,
 						cp,
 						moves,
 						ct),
@@ -6833,11 +6822,9 @@ var $author$project$Render$moveTo = F3(
 			var ctToNt = _Utils_update(
 				model,
 				{
-					checkers: A6(
+					checkers: A4(
 						$author$project$Structs$C,
 						A2($author$project$Structs$Board, b, bs),
-						p1,
-						p2,
 						cp,
 						moves,
 						$author$project$Render$wrapTile(nt)),
@@ -6856,11 +6843,9 @@ var $author$project$Render$moveTo = F3(
 					if (A2($author$project$Logic$equalColors, color, cp)) {
 						var _v7 = A3(
 							$author$project$Logic$movePiece,
-							A6(
+							A4(
 								$author$project$Structs$C,
 								A2($author$project$Structs$Board, b, bs),
-								p1,
-								p2,
 								cp,
 								moves,
 								ct),
@@ -6886,11 +6871,9 @@ var $author$project$Render$moveTo = F3(
 					var _v9 = _v3.a;
 					var _v10 = A3(
 						$author$project$Logic$movePiece,
-						A6(
+						A4(
 							$author$project$Structs$C,
 							A2($author$project$Structs$Board, b, bs),
-							p1,
-							p2,
 							cp,
 							moves,
 							ct),
@@ -6912,6 +6895,17 @@ var $author$project$Render$moveTo = F3(
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Render$playerName = F2(
+	function (name, player) {
+		if ((player.$ === 'Just') && (player.a.$ === 'Human')) {
+			var _v1 = player.a;
+			var col = _v1.b;
+			return $elm$core$Maybe$Just(
+				A2($author$project$Structs$Human, name, col));
+		} else {
+			return player;
+		}
+	});
 var $author$project$Structs$Robot = F2(
 	function (a, b) {
 		return {$: 'Robot', a: a, b: b};
@@ -6937,10 +6931,10 @@ var $author$project$Render$playerStrToP = F3(
 					switch (_v0.b) {
 						case 1:
 							return $elm$core$Maybe$Just(
-								A2($author$project$Structs$Robot, name, $author$project$Structs$B));
+								A2($author$project$Structs$Robot, 'Player 1 Robot', $author$project$Structs$B));
 						case 2:
 							return $elm$core$Maybe$Just(
-								A2($author$project$Structs$Robot, name, $author$project$Structs$R));
+								A2($author$project$Structs$Robot, 'Player 2 Robot', $author$project$Structs$R));
 						default:
 							break _v0$4;
 					}
@@ -6987,19 +6981,19 @@ var $author$project$Logic$makeBotMove = function (checkers) {
 	if ($elm$core$List$isEmpty(legalMoves)) {
 		return $elm$core$Maybe$Nothing;
 	} else {
-		if (checkers.d.$ === 'B') {
-			var _v4 = checkers.d;
+		if (checkers.b.$ === 'B') {
+			var _v4 = checkers.b;
 			return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
 		} else {
-			var _v5 = checkers.d;
+			var _v5 = checkers.b;
 			return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
 		}
 	}
 };
 var $author$project$Render$updateBotMove = function (model) {
 	var _v0 = model.checkers;
-	if (_v0.d.$ === 'B') {
-		var _v1 = _v0.d;
+	if (_v0.b.$ === 'B') {
+		var _v1 = _v0.b;
 		if ($author$project$Logic$checkBot(model.player1)) {
 			var _v2 = $author$project$Logic$makeBotMove(model.checkers);
 			if (_v2.$ === 'Nothing') {
@@ -7014,7 +7008,7 @@ var $author$project$Render$updateBotMove = function (model) {
 			return model;
 		}
 	} else {
-		var _v3 = _v0.d;
+		var _v3 = _v0.b;
 		if ($author$project$Logic$checkBot(model.player2)) {
 			var _v4 = $author$project$Logic$makeBotMove(model.checkers);
 			if (_v4.$ === 'Nothing') {
@@ -7042,11 +7036,9 @@ var $author$project$Render$update = F2(
 		var pr = _v3.c;
 		var xOld = _v3.d;
 		var yOld = _v3.e;
-		var p1 = _v1.b;
-		var p2 = _v1.c;
-		var cp = _v1.d;
-		var moves = _v1.e;
-		var ct = _v1.f;
+		var cp = _v1.b;
+		var moves = _v1.c;
+		var ct = _v1.d;
 		var p = _v0.b;
 		switch (msg.$) {
 			case 'Click':
@@ -7057,14 +7049,12 @@ var $author$project$Render$update = F2(
 					A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld));
 				var newTile = A2(
 					$author$project$Logic$boardRef,
-					A6(
+					A4(
 						$author$project$Structs$C,
 						A2(
 							$author$project$Structs$Board,
 							b,
 							A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
-						p1,
-						p2,
 						cp,
 						moves,
 						ct),
@@ -7074,21 +7064,19 @@ var $author$project$Render$update = F2(
 					_Utils_update(
 						model,
 						{
-							checkers: A6(
+							checkers: A4(
 								$author$project$Structs$C,
 								A2(
 									$author$project$Structs$Board,
 									b,
 									A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
-								p1,
-								p2,
 								cp,
 								moves,
 								$elm$core$Maybe$Nothing),
 							point: pNew
 						}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
-					$author$project$Render$gameEnded(
+					model.init ? model : $author$project$Render$gameEnded(
 						$author$project$Render$updateBotMove(
 							A3($author$project$Render$moveTo, newTile, model, msg))),
 					$elm$core$Platform$Cmd$none);
@@ -7102,14 +7090,12 @@ var $author$project$Render$update = F2(
 						_Utils_update(
 							model,
 							{
-								checkers: A6(
+								checkers: A4(
 									$author$project$Structs$C,
 									A2(
 										$author$project$Structs$Board,
 										b,
 										A5($author$project$Structs$BS, bords, cs, pr, x, y)),
-									p1,
-									p2,
 									cp,
 									moves,
 									ct),
@@ -7122,29 +7108,61 @@ var $author$project$Render$update = F2(
 			case 'UpdatePlayer1':
 				var p1s = msg.a;
 				return _Utils_Tuple2(
-					_Utils_update(
+					model.init ? _Utils_update(
 						model,
 						{
 							player1: A3($author$project$Render$playerStrToP, p1s, '', 1)
-						}),
+						}) : model,
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'UpdatePlayer2':
 				var p2s = msg.a;
 				return _Utils_Tuple2(
-					_Utils_update(
+					model.init ? _Utils_update(
 						model,
 						{
 							player2: A3($author$project$Render$playerStrToP, p2s, '', 2)
-						}),
+						}) : model,
+					$elm$core$Platform$Cmd$none);
+			case 'UpdatePlayer1Name':
+				var p1s = msg.a;
+				return _Utils_Tuple2(
+					model.init ? _Utils_update(
+						model,
+						{
+							player1: A2($author$project$Render$playerName, p1s, model.player1)
+						}) : model,
+					$elm$core$Platform$Cmd$none);
+			case 'UpdatePlayer2Name':
+				var p2s = msg.a;
+				return _Utils_Tuple2(
+					model.init ? _Utils_update(
+						model,
+						{
+							player2: A2($author$project$Render$playerName, p2s, model.player2)
+						}) : model,
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{init: false}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Render$Submit = {$: 'Submit'};
 var $author$project$Render$UpdatePlayer1 = function (a) {
 	return {$: 'UpdatePlayer1', a: a};
+};
+var $author$project$Render$UpdatePlayer1Name = function (a) {
+	return {$: 'UpdatePlayer1Name', a: a};
 };
 var $author$project$Render$UpdatePlayer2 = function (a) {
 	return {$: 'UpdatePlayer2', a: a};
 };
+var $author$project$Render$UpdatePlayer2Name = function (a) {
+	return {$: 'UpdatePlayer2Name', a: a};
+};
+var $elm$html$Html$b = _VirtualDom_node('b');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -7468,13 +7486,31 @@ var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -7502,9 +7538,11 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$option = _VirtualDom_node('option');
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$select = _VirtualDom_node('select');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Render$view = function (model) {
 	var _v0 = _Utils_Tuple2(model.checkers, model.point);
@@ -7517,8 +7555,9 @@ var $author$project$Render$view = function (model) {
 	var pr = _v3.c;
 	var mx = _v3.d;
 	var my = _v3.e;
-	var cp = _v1.d;
-	var ct = _v1.f;
+	var cp = _v1.b;
+	var moves = _v1.c;
+	var ct = _v1.d;
 	var endText = model.gameOver ? ('Game over: ' + function () {
 		if (cp.$ === 'R') {
 			return 'Black Wins!';
@@ -7557,75 +7596,220 @@ var $author$project$Render$view = function (model) {
 							A5($author$project$Structs$BS, bords, cs, pr, mx, my)),
 						ct)
 					])),
-				A2(
-				$elm$html$Html$form,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$id('players')
-					]),
+				model.init ? A2(
+				$elm$html$Html$div,
+				_List_Nil,
 				_List_fromArray(
 					[
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
-						$elm$html$Html$select,
+						$elm$html$Html$b,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$id('choice1'),
-								$elm$html$Html$Events$onInput($author$project$Render$UpdatePlayer1)
+								A2($elm$html$Html$Attributes$style, 'font-size', '35px')
 							]),
 						_List_fromArray(
 							[
-								A2(
-								$elm$html$Html$option,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$value('human')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Human')
-									])),
-								A2(
-								$elm$html$Html$option,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$value('bot')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Bot')
-									]))
+								$elm$html$Html$text('Please fill out fields below.')
 							])),
 						A2(
-						$elm$html$Html$select,
+						$elm$html$Html$form,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$id('choice2'),
-								$elm$html$Html$Events$onInput($author$project$Render$UpdatePlayer2)
+								$elm$html$Html$Attributes$id('players')
 							]),
 						_List_fromArray(
 							[
+								A2($elm$html$Html$br, _List_Nil, _List_Nil),
 								A2(
-								$elm$html$Html$option,
+								$elm$html$Html$b,
+								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$value('human')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('Human')
+										$elm$html$Html$text('Player 1 : ')
 									])),
 								A2(
-								$elm$html$Html$option,
+								$elm$html$Html$select,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$value('bot')
+										$elm$html$Html$Attributes$id('choice1'),
+										$elm$html$Html$Events$onInput($author$project$Render$UpdatePlayer1)
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Bot')
-									]))
+										A2(
+										$elm$html$Html$option,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$value('human')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Human')
+											])),
+										A2(
+										$elm$html$Html$option,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$value('bot')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Bot')
+											]))
+									])),
+								function () {
+								var _v4 = model.player1;
+								if ((_v4.$ === 'Just') && (_v4.a.$ === 'Human')) {
+									var _v5 = _v4.a;
+									return A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$id('choice1Name'),
+												$elm$html$Html$Attributes$placeholder('Player 1\'s Name'),
+												$elm$html$Html$Events$onInput($author$project$Render$UpdatePlayer1Name)
+											]),
+										_List_Nil);
+								} else {
+									return $elm$html$Html$text('');
+								}
+							}(),
+								A2($elm$html$Html$br, _List_Nil, _List_Nil),
+								A2(
+								$elm$html$Html$b,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Player 2 : ')
+									])),
+								A2(
+								$elm$html$Html$select,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$id('choice2'),
+										$elm$html$Html$Events$onInput($author$project$Render$UpdatePlayer2)
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$option,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$value('human')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Human')
+											])),
+										A2(
+										$elm$html$Html$option,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$value('bot')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Bot')
+											]))
+									])),
+								function () {
+								var _v6 = model.player2;
+								if ((_v6.$ === 'Just') && (_v6.a.$ === 'Human')) {
+									var _v7 = _v6.a;
+									return A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$type_('text'),
+												$elm$html$Html$Attributes$id('choice2Name'),
+												$elm$html$Html$Attributes$placeholder('Player 2\'s Name'),
+												$elm$html$Html$Events$onInput($author$project$Render$UpdatePlayer2Name)
+											]),
+										_List_Nil);
+								} else {
+									return $elm$html$Html$text('');
+								}
+							}(),
+								A2($elm$html$Html$br, _List_Nil, _List_Nil),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$value('Submit'),
+										$elm$html$Html$Events$onClick($author$project$Render$Submit)
+									]),
+								_List_Nil)
 							]))
+					])) : A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'font-size', '20px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'font-size', '35px')
+							]),
+						model.init ? _List_Nil : _List_fromArray(
+							[
+								function () {
+								var _v8 = _Utils_Tuple2(model.player1, model.player2);
+								_v8$4:
+								while (true) {
+									if (_v8.a.$ === 'Just') {
+										if (_v8.a.a.$ === 'Robot') {
+											if (_v8.b.$ === 'Just') {
+												if (_v8.b.a.$ === 'Robot') {
+													var _v9 = _v8.a.a;
+													var name1 = _v9.a;
+													var _v10 = _v8.b.a;
+													var name2 = _v10.a;
+													return $elm$html$Html$text(name1 + (' vs. ' + name2));
+												} else {
+													var _v13 = _v8.a.a;
+													var name1 = _v13.a;
+													var _v14 = _v8.b.a;
+													var name2 = _v14.a;
+													return $elm$html$Html$text(name1 + (' vs.  ' + name2));
+												}
+											} else {
+												break _v8$4;
+											}
+										} else {
+											if (_v8.b.$ === 'Just') {
+												if (_v8.b.a.$ === 'Robot') {
+													var _v11 = _v8.a.a;
+													var name1 = _v11.a;
+													var _v12 = _v8.b.a;
+													var name2 = _v12.a;
+													return $elm$html$Html$text(name1 + (' vs. ' + name2));
+												} else {
+													var _v15 = _v8.a.a;
+													var name1 = _v15.a;
+													var _v16 = _v8.b.a;
+													var name2 = _v16.a;
+													return $elm$html$Html$text(name1 + (' vs. ' + name2));
+												}
+											} else {
+												break _v8$4;
+											}
+										}
+									} else {
+										break _v8$4;
+									}
+								}
+								return $elm$html$Html$text('');
+							}()
+							])),
+						$elm$html$Html$text(
+						'Overall number of moves: ' + $elm$core$Debug$toString(moves))
 					]))
 			]));
 };

@@ -25,18 +25,6 @@
                 var res = boardOffset();
                 app.ports.recieveBoardOffset.send(res);
             });
-            let form  = document.getElementById('players');
-            console.log(form);
-            form.addEventListener('submit', (event) => {
-                console.log(event);
-            });
-            function formInfo() {
-                const player1 = FormData.get('player1');
-                const player2 = FormData.get('player2');
-                const p1choice = document.getElementById('choice1').value;
-                const p2choice = document.getElementById('choice2').value;
-                console.log(player1, p1choice, player2, p2choice);
-            };
         </script>
     </body>
 </html>

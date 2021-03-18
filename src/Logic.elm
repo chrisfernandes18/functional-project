@@ -383,7 +383,7 @@ getLegalMoves checkers tile =
 getAllLegalMoves : Checkers -> List ( LogicalLoc, Tile )
 getAllLegalMoves checkers =
     case checkers of
-        C (Board board _) _ _ currPlayer _ _ ->
+        C (Board board _) currPlayer _ _ ->
             let
                 tiles =
                     Array.toList (getPlayerTiles board currPlayer)
@@ -523,7 +523,7 @@ boardRef c (LL row col) =
     -- Takes the game and a location and returns the tile
     -- if its Empty or a Piece
     case c of
-        C b _ _ _ _ _ ->
+        C b _ _ _ ->
             case b of
                 Board arr _ ->
                     case Array.get row arr of
@@ -546,7 +546,7 @@ movePiece c (LL newRow newCol) t =
     -- nothing
     if legalMove c (LL newRow newCol) t then
         case ( c, t ) of
-            ( C (Board b bs) p1 p2 cp moves _, Piece _ (LL curRow curCol) move ) ->
+            ( C (Board b bs) cp moves _, Piece _ (LL curRow curCol) move ) ->
                 let
                     -- will king the piece if it's a king
                     newPiece =
@@ -615,10 +615,10 @@ movePiece c (LL newRow newCol) t =
                         board =
                             Array.set takeRow takeBoardCol newBoardFinal
                     in
-                    Just (C (Board board bs) p1 p2 (changeColor cp) (moves + 1) Nothing)
+                    Just (C (Board board bs) (changeColor cp) (moves + 1) Nothing)
 
                 else
-                    Just (C (Board newBoardFinal bs) p1 p2 (changeColor cp) (moves + 1) Nothing)
+                    Just (C (Board newBoardFinal bs) (changeColor cp) (moves + 1) Nothing)
 
             _ ->
                 Nothing
@@ -667,17 +667,17 @@ makeBotMove checkers =
     else
         case checkers of
             -- assume only given with correct inputs
-            C _ _ _ B _ _ ->
+            C _ B _ _ ->
                 movePiece checkers randomLLoc randomTile
 
-            C _ _ _ R _ _ ->
+            C _ R _ _ ->
                 movePiece checkers randomLLoc randomTile
 
 
 endGame : Checkers -> Bool
 endGame checkers =
     case checkers of
-        C (Board board _) _ _ currPlayer _ _ ->
+        C (Board board _) currPlayer _ _ ->
             let
                 -- rowContains? is True if one row has one element of curPlayer
                 currentPlayerTile =

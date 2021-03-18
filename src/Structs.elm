@@ -65,4 +65,4 @@ type alias CurrPlayer =
 
 
 type Checkers
-    = C Board (Maybe Player) (Maybe Player) CurrPlayer {- number of Moves -} Int (Maybe Tile)
+    = C Board CurrPlayer {- number of Moves -} Int (Maybe Tile)

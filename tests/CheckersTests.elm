@@ -11,7 +11,7 @@ import Test exposing (..)
 testBoardSpec : BoardSpec
 testBoardSpec =
     -- test boardspec
-    BS 70 30 10 10
+    BS 10 70 30 10 10
 
 
 testBoard : Array (Array Tile)

@@ -1,6 +1,6 @@
 module CheckersTests exposing (..)
 
-import Array
+import Array exposing (..)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Logic
@@ -17,6 +17,11 @@ testCheckers =
 testBoardSpec : BoardSpec
 testBoardSpec =
     BS 70 30 10 10
+
+
+testBoard : Array (Array Tile)
+testBoard =
+    Logic.newBoard 8
 
 
 
@@ -164,75 +169,162 @@ suite =
             \() ->
                 let
                     input =
-                        LL 0 0
+                        PL 90 10
 
                     expected =
-                        PL 10 10
+                        LL 0 1
                 in
                 input
-                    |> Logic.logicalToPhysical
+                    |> Logic.physicalToLogical
                     |> (\func ->
                             func testBoardSpec
                        )
                     |> Expect.equal expected
-        , Test.test "equalColors" <|
+        , Test.test "equalColors True" <|
             \() ->
                 let
-                    input =
-                        LL 0 0
+                    input1 =
+                        B
+
+                    input2 =
+                        B
 
                     expected =
-                        PL 10 10
+                        True
                 in
-                input
-                    |> Logic.logicalToPhysical
+                input1
+                    |> Logic.equalColors
                     |> (\func ->
-                            func testBoardSpec
+                            func input2
                        )
                     |> Expect.equal expected
-        , Test.test "equalTiles" <|
+        , Test.test "equalColors False" <|
             \() ->
                 let
-                    input =
-                        LL 0 0
+                    input1 =
+                        B
+
+                    input2 =
+                        R
 
                     expected =
-                        PL 10 10
+                        False
                 in
-                input
-                    |> Logic.logicalToPhysical
+                input1
+                    |> Logic.equalColors
                     |> (\func ->
-                            func testBoardSpec
+                            func input2
+                       )
+                    |> Expect.equal expected
+        , Test.test "equalTiles True" <|
+            \() ->
+                let
+                    input1 =
+                        Piece B (LL 0 0) Inc
+
+                    input2 =
+                        Piece B (LL 0 0) Inc
+
+                    expected =
+                        True
+                in
+                input1
+                    |> Logic.equalTiles
+                    |> (\func ->
+                            func input2
+                       )
+                    |> Expect.equal expected
+        , Test.test "equalTiles False" <|
+            \() ->
+                let
+                    input1 =
+                        Piece B (LL 1 0) Inc
+
+                    input2 =
+                        Piece B (LL 0 0) Inc
+
+                    expected =
+                        False
+                in
+                input1
+                    |> Logic.equalTiles
+                    |> (\func ->
+                            func input2
                        )
                     |> Expect.equal expected
         , Test.test "newBoard" <|
             \() ->
                 let
                     input =
-                        LL 0 0
+                        8
 
                     expected =
-                        PL 10 10
+                        Array.fromList
+                            [ Array.fromList [ E, Piece B (LL 0 1) Inc, E, Piece B (LL 0 3) Inc, E, Piece B (LL 0 5) Inc, E, Piece B (LL 0 7) Inc ]
+                            , Array.fromList [ Piece B (LL 1 0) Inc, E, Piece B (LL 1 2) Inc, E, Piece B (LL 1 4) Inc, E, Piece B (LL 1 6) Inc, E ]
+                            , Array.fromList [ E, Piece B (LL 2 1) Inc, E, Piece B (LL 2 3) Inc, E, Piece B (LL 2 5) Inc, E, Piece B (LL 2 7) Inc ]
+                            , Array.fromList [ E, E, E, E, E, E, E, E ]
+                            , Array.fromList [ E, E, E, E, E, E, E, E ]
+                            , Array.fromList [ Piece R (LL 5 0) Dec, E, Piece R (LL 5 2) Dec, E, Piece R (LL 5 4) Dec, E, Piece R (LL 5 6) Dec, E ]
+                            , Array.fromList [ E, Piece R (LL 6 1) Dec, E, Piece R (LL 6 3) Dec, E, Piece R (LL 6 5) Dec, E, Piece R (LL 6 7) Dec ]
+                            , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
+                            ]
                 in
                 input
-                    |> Logic.logicalToPhysical
-                    |> (\func ->
-                            func testBoardSpec
-                       )
+                    |> Logic.newBoard
                     |> Expect.equal expected
-        , Test.test "boardRef" <|
+        , Test.test "boardRef Empty" <|
             \() ->
                 let
-                    input =
+                    input1 =
+                        testCheckers
+
+                    input2 =
                         LL 0 0
 
                     expected =
-                        PL 10 10
+                        E
                 in
-                input
-                    |> Logic.logicalToPhysical
+                input1
+                    |> Logic.boardRef
                     |> (\func ->
-                            func testBoardSpec
+                            func input2
+                       )
+                    |> Expect.equal expected
+        , Test.test "boardRef Black Piece" <|
+            \() ->
+                let
+                    input1 =
+                        testCheckers
+
+                    input2 =
+                        LL 0 1
+
+                    expected =
+                        Piece B (LL 0 1) Inc
+                in
+                input1
+                    |> Logic.boardRef
+                    |> (\func ->
+                            func input2
+                       )
+                    |> Expect.equal expected
+        , Test.test "boardRef Red Piece" <|
+            \() ->
+                let
+                    input1 =
+                        testCheckers
+
+                    input2 =
+                        LL 7 6
+
+                    expected =
+                        Piece R (LL 7 6) Dec
+                in
+                input1
+                    |> Logic.boardRef
+                    |> (\func ->
+                            func input2
                        )
                     |> Expect.equal expected
         ]

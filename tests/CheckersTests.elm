@@ -327,4 +327,180 @@ suite =
                             func input2
                        )
                     |> Expect.equal expected
+        , Test.test "movePiece non-capture valid move" <|
+            \() ->
+                let
+                    input1 =
+                        testCheckers
+
+                    input2 =
+                        LL 3 4
+
+                    input3 =
+                        Piece B (LL 2 3) Inc
+
+                    expected =
+                        Just
+                            (C
+                                (Board
+                                    (Array.fromList
+                                        [ Array.fromList [ E, Piece B (LL 0 1) Inc, E, Piece B (LL 0 3) Inc, E, Piece B (LL 0 5) Inc, E, Piece B (LL 0 7) Inc ]
+                                        , Array.fromList [ Piece B (LL 1 0) Inc, E, Piece B (LL 1 2) Inc, E, Piece B (LL 1 4) Inc, E, Piece B (LL 1 6) Inc, E ]
+                                        , Array.fromList [ E, Piece B (LL 2 1) Inc, E, E, E, Piece B (LL 2 5) Inc, E, Piece B (LL 2 7) Inc ]
+                                        , Array.fromList [ E, E, E, E, Piece B (LL 3 4) Inc, E, E, E ]
+                                        , Array.fromList [ E, E, E, E, E, E, E, E ]
+                                        , Array.fromList [ Piece R (LL 5 0) Dec, E, Piece R (LL 5 2) Dec, E, Piece R (LL 5 4) Dec, E, Piece R (LL 5 6) Dec, E ]
+                                        , Array.fromList [ E, Piece R (LL 6 1) Dec, E, Piece R (LL 6 3) Dec, E, Piece R (LL 6 5) Dec, E, Piece R (LL 6 7) Dec ]
+                                        , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
+                                        ]
+                                    )
+                                    (BS 70 30 10 10)
+                                )
+                                Nothing
+                                Nothing
+                                R
+                                0
+                                Nothing
+                            )
+                in
+                input1
+                    |> Logic.movePiece
+                    |> (\func ->
+                            func input2
+                       )
+                    |> (\func ->
+                            func input3
+                       )
+                    |> Expect.equal expected
+        , Test.test "movePiece non-capture invalid move" <|
+            \() ->
+                let
+                    input1 =
+                        testCheckers
+
+                    input2 =
+                        LL 4 5
+
+                    input3 =
+                        Piece B (LL 2 3) Inc
+
+                    expected =
+                        Nothing
+                in
+                input1
+                    |> Logic.movePiece
+                    |> (\func ->
+                            func input2
+                       )
+                    |> (\func ->
+                            func input3
+                       )
+                    |> Expect.equal expected
+        , Test.test "movePiece valid Capture" <|
+            \() ->
+                let
+                    input1 =
+                        C
+                            (Board
+                                (Array.fromList
+                                    [ Array.fromList [ E, Piece B (LL 0 1) Inc, E, Piece B (LL 0 3) Inc, E, Piece B (LL 0 5) Inc, E, Piece B (LL 0 7) Inc ]
+                                    , Array.fromList [ Piece B (LL 1 0) Inc, E, Piece B (LL 1 2) Inc, E, Piece B (LL 1 4) Inc, E, Piece B (LL 1 6) Inc, E ]
+                                    , Array.fromList [ E, Piece B (LL 2 1) Inc, E, E, E, Piece B (LL 2 5) Inc, E, Piece B (LL 2 7) Inc ]
+                                    , Array.fromList [ E, E, E, E, Piece B (LL 3 4) Inc, E, E, E ]
+                                    , Array.fromList [ E, E, E, Piece R (LL 4 3) Dec, E, E, E, E ]
+                                    , Array.fromList [ Piece R (LL 5 0) Dec, E, E, E, Piece R (LL 5 4) Dec, E, Piece R (LL 5 6) Dec, E ]
+                                    , Array.fromList [ E, Piece R (LL 6 1) Dec, E, Piece R (LL 6 3) Dec, E, Piece R (LL 6 5) Dec, E, Piece R (LL 6 7) Dec ]
+                                    , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
+                                    ]
+                                )
+                                (BS 70 30 493.5 82)
+                            )
+                            Nothing
+                            Nothing
+                            B
+                            0
+                            Nothing
+
+                    input2 =
+                        LL 5 2
+
+                    input3 =
+                        Piece B (LL 3 4) Inc
+
+                    expected =
+                        Just
+                            (C
+                                (Board
+                                    (Array.fromList
+                                        [ Array.fromList [ E, Piece B (LL 0 1) Inc, E, Piece B (LL 0 3) Inc, E, Piece B (LL 0 5) Inc, E, Piece B (LL 0 7) Inc ]
+                                        , Array.fromList [ Piece B (LL 1 0) Inc, E, Piece B (LL 1 2) Inc, E, Piece B (LL 1 4) Inc, E, Piece B (LL 1 6) Inc, E ]
+                                        , Array.fromList [ E, Piece B (LL 2 1) Inc, E, E, E, Piece B (LL 2 5) Inc, E, Piece B (LL 2 7) Inc ]
+                                        , Array.fromList [ E, E, E, E, E, E, E, E ]
+                                        , Array.fromList [ E, E, E, E, E, E, E, E ]
+                                        , Array.fromList [ Piece R (LL 5 0) Dec, E, Piece B (LL 5 2) Inc, E, Piece R (LL 5 4) Dec, E, Piece R (LL 5 6) Dec, E ]
+                                        , Array.fromList [ E, Piece R (LL 6 1) Dec, E, Piece R (LL 6 3) Dec, E, Piece R (LL 6 5) Dec, E, Piece R (LL 6 7) Dec ]
+                                        , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
+                                        ]
+                                    )
+                                    (BS 70 30 493.5 82)
+                                )
+                                Nothing
+                                Nothing
+                                R
+                                0
+                                Nothing
+                            )
+                in
+                input1
+                    |> Logic.movePiece
+                    |> (\func ->
+                            func input2
+                       )
+                    |> (\func ->
+                            func input3
+                       )
+                    |> Expect.equal expected
+        , Test.test "movePiece invalid Capture" <|
+            \() ->
+                let
+                    input1 =
+                        C
+                            (Board
+                                (Array.fromList
+                                    [ Array.fromList [ E, Piece B (LL 0 1) Inc, E, Piece B (LL 0 3) Inc, E, Piece B (LL 0 5) Inc, E, Piece B (LL 0 7) Inc ]
+                                    , Array.fromList [ Piece B (LL 1 0) Inc, E, Piece B (LL 1 2) Inc, E, Piece B (LL 1 4) Inc, E, Piece B (LL 1 6) Inc, E ]
+                                    , Array.fromList [ E, Piece B (LL 2 1) Inc, E, E, E, E, E, Piece B (LL 2 7) Inc ]
+                                    , Array.fromList [ E, E, E, E, Piece B (LL 3 4) Inc, E, E, E ]
+                                    , Array.fromList [ E, E, E, Piece R (LL 4 3) Dec, E, E, E, E ]
+                                    , Array.fromList [ Piece R (LL 5 0) Dec, E, Piece B (LL 5 2) Inc, E, E, E, Piece R (LL 5 6) Dec, E ]
+                                    , Array.fromList [ E, Piece R (LL 6 1) Dec, E, Piece R (LL 6 3) Dec, E, Piece R (LL 6 5) Dec, E, Piece R (LL 6 7) Dec ]
+                                    , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
+                                    ]
+                                )
+                                (BS 70 30 493.5 82)
+                            )
+                            Nothing
+                            Nothing
+                            R
+                            0
+                            Nothing
+
+                    input2 =
+                        LL 4 3
+
+                    input3 =
+                        Piece R (LL 6 1) Dec
+
+                    expected =
+                        Nothing
+                in
+                input1
+                    |> Logic.movePiece
+                    |> (\func ->
+                            func input2
+                       )
+                    |> (\func ->
+                            func input3
+                       )
+                    |> Expect.equal expected
         ]

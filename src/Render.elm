@@ -98,8 +98,8 @@ initModel =
     { checkers = C (Board (newBoard 8) (BS 10 70 30 10 10)) B 0 Nothing
     , point = { x = 0, y = 0 }
     , gameOver = False
-    , player1 = Just (Human "" B)
-    , player2 = Just (Human "" R)
+    , player1 = Just (Human "Player 1" B)
+    , player2 = Just (Human "Player 2" R)
     , init = True
     }
 

@@ -5280,9 +5280,9 @@ var $author$project$Render$initModel = {
 	gameOver: false,
 	init: true,
 	player1: $elm$core$Maybe$Just(
-		A2($author$project$Structs$Human, '', $author$project$Structs$B)),
+		A2($author$project$Structs$Human, 'Player 1', $author$project$Structs$B)),
 	player2: $elm$core$Maybe$Just(
-		A2($author$project$Structs$Human, '', $author$project$Structs$R)),
+		A2($author$project$Structs$Human, 'Player 2', $author$project$Structs$R)),
 	point: {x: 0, y: 0}
 };
 var $elm$json$Json$Encode$null = _Json_encodeNull;

@@ -501,12 +501,12 @@ logicalToPhysical ll bs =
     -- Converts the location within data structures to
     -- where it should be in GUI
     case ( ll, bs ) of
-        ( LL row col, BS cs _ mx my ) ->
+        ( LL row col, BS bords cs _ mx my ) ->
             if not (withinBounds ll) then
                 Debug.todo "logicalToPhysical: spot not on board"
 
             else
-                PL (my + (cs * toFloat col)) (mx + (cs * toFloat row))
+                PL (my + bords + (cs * toFloat col)) (mx + bords + (cs * toFloat row))
 
 
 physicalToLogical : PhysicalLoc -> BoardSpec -> LogicalLoc
@@ -514,8 +514,8 @@ physicalToLogical pl bs =
     -- Converts the location on GUI to where it should be within
     -- data structures
     case ( pl, bs ) of
-        ( PL x y, BS cs _ mx my ) ->
-            LL (floor ((y - my) / cs)) (floor ((x - mx) / cs))
+        ( PL x y, BS bords cs _ mx my ) ->
+            LL (floor ((y - my - bords) / cs)) (floor ((x - mx - bords) / cs))
 
 
 boardRef : Checkers -> LogicalLoc -> Tile

@@ -5182,9 +5182,9 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Structs$B = {$: 'B'};
-var $author$project$Structs$BS = F4(
-	function (a, b, c, d) {
-		return {$: 'BS', a: a, b: b, c: c, d: d};
+var $author$project$Structs$BS = F5(
+	function (a, b, c, d, e) {
+		return {$: 'BS', a: a, b: b, c: c, d: d, e: e};
 	});
 var $author$project$Structs$Board = F2(
 	function (a, b) {
@@ -5273,7 +5273,7 @@ var $author$project$Render$initModel = {
 		A2(
 			$author$project$Structs$Board,
 			$author$project$Logic$newBoard(8),
-			A4($author$project$Structs$BS, 70, 30, 10, 10)),
+			A5($author$project$Structs$BS, 10, 70, 30, 10, 10)),
 		$elm$core$Maybe$Nothing,
 		$elm$core$Maybe$Nothing,
 		$author$project$Structs$B,
@@ -6770,13 +6770,14 @@ var $author$project$Logic$physicalToLogical = F2(
 		var x = _v1.a;
 		var y = _v1.b;
 		var _v2 = _v0.b;
-		var cs = _v2.a;
-		var mx = _v2.c;
-		var my = _v2.d;
+		var bords = _v2.a;
+		var cs = _v2.b;
+		var mx = _v2.d;
+		var my = _v2.e;
 		return A2(
 			$author$project$Structs$LL,
-			$elm$core$Basics$floor((y - my) / cs),
-			$elm$core$Basics$floor((x - mx) / cs));
+			$elm$core$Basics$floor(((y - my) - bords) / cs),
+			$elm$core$Basics$floor(((x - mx) - bords) / cs));
 	});
 var $author$project$Render$unwrapTile = function (mt) {
 	if (mt.$ === 'Nothing') {
@@ -7036,10 +7037,11 @@ var $author$project$Render$update = F2(
 		var _v2 = _v1.a;
 		var b = _v2.a;
 		var _v3 = _v2.b;
-		var cs = _v3.a;
-		var pr = _v3.b;
-		var xOld = _v3.c;
-		var yOld = _v3.d;
+		var bords = _v3.a;
+		var cs = _v3.b;
+		var pr = _v3.c;
+		var xOld = _v3.d;
+		var yOld = _v3.e;
 		var p1 = _v1.b;
 		var p2 = _v1.c;
 		var cp = _v1.d;
@@ -7052,7 +7054,7 @@ var $author$project$Render$update = F2(
 				var pl = A2(
 					$author$project$Logic$physicalToLogical,
 					A2($author$project$Structs$PL, pNew.x, pNew.y),
-					A4($author$project$Structs$BS, cs, pr, xOld, yOld));
+					A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld));
 				var newTile = A2(
 					$author$project$Logic$boardRef,
 					A6(
@@ -7060,7 +7062,7 @@ var $author$project$Render$update = F2(
 						A2(
 							$author$project$Structs$Board,
 							b,
-							A4($author$project$Structs$BS, cs, pr, xOld, yOld)),
+							A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
 						p1,
 						p2,
 						cp,
@@ -7077,7 +7079,7 @@ var $author$project$Render$update = F2(
 								A2(
 									$author$project$Structs$Board,
 									b,
-									A4($author$project$Structs$BS, cs, pr, xOld, yOld)),
+									A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
 								p1,
 								p2,
 								cp,
@@ -7105,7 +7107,7 @@ var $author$project$Render$update = F2(
 									A2(
 										$author$project$Structs$Board,
 										b,
-										A4($author$project$Structs$BS, cs, pr, x, y)),
+										A5($author$project$Structs$BS, bords, cs, pr, x, y)),
 									p1,
 									p2,
 									cp,
@@ -7214,8 +7216,8 @@ var $author$project$Render$boardToHTML = F2(
 	function (b, til) {
 		var arr = b.a;
 		var _v1 = b.b;
-		var cs = _v1.a;
-		var pr = _v1.b;
+		var cs = _v1.b;
+		var pr = _v1.c;
 		var swidth = $elm$svg$Svg$Attributes$height(
 			$elm$core$Debug$toString(cs));
 		var sheight = $elm$svg$Svg$Attributes$height(
@@ -7510,10 +7512,11 @@ var $author$project$Render$view = function (model) {
 	var _v2 = _v1.a;
 	var b = _v2.a;
 	var _v3 = _v2.b;
-	var cs = _v3.a;
-	var pr = _v3.b;
-	var mx = _v3.c;
-	var my = _v3.d;
+	var bords = _v3.a;
+	var cs = _v3.b;
+	var pr = _v3.c;
+	var mx = _v3.d;
+	var my = _v3.e;
 	var cp = _v1.d;
 	var ct = _v1.f;
 	var endText = model.gameOver ? ('Game over: ' + function () {
@@ -7551,7 +7554,7 @@ var $author$project$Render$view = function (model) {
 						A2(
 							$author$project$Structs$Board,
 							b,
-							A4($author$project$Structs$BS, cs, pr, mx, my)),
+							A5($author$project$Structs$BS, bords, cs, pr, mx, my)),
 						ct)
 					])),
 				A2(

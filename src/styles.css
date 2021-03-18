@@ -3,7 +3,7 @@ body {
 }
 
 table {
-  border: 0px;
+  border: 10px solid black;
   border-spacing: 0px;
 }
 tr {

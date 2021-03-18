@@ -91,7 +91,7 @@ init () =
 
 initModel : Model
 initModel =
-    { checkers = C (Board (newBoard 8) (BS 70 30 10 10)) Nothing Nothing B 0 Nothing
+    { checkers = C (Board (newBoard 8) (BS 10 70 30 10 10)) Nothing Nothing B 0 Nothing
     , point = { x = 0, y = 0 }
     , gameOver = False
     , player1 = Just (Human "" B)
@@ -102,7 +102,7 @@ initModel =
 boardToHTML : Board -> Maybe Tile -> Html Msg
 boardToHTML b til =
     case b of
-        Board arr (BS cs pr _ _) ->
+        Board arr (BS _ cs pr _ _) ->
             let
                 curTile =
                     case til of
@@ -276,7 +276,7 @@ boardToHTML b til =
 view : Model -> Html Msg
 view model =
     case ( model.checkers, model.point ) of
-        ( C (Board b (BS cs pr mx my)) _ _ cp _ ct, _ ) ->
+        ( C (Board b (BS bords cs pr mx my)) _ _ cp _ ct, _ ) ->
             let
                 endText =
                     if model.gameOver then
@@ -299,7 +299,7 @@ view model =
                     [ Html.text endText ]
                 , Html.div
                     []
-                    [ boardToHTML (Board b (BS cs pr mx my)) ct ]
+                    [ boardToHTML (Board b (BS bords cs pr mx my)) ct ]
                 , Html.form
                     [ HAttrs.id "players" ]
                     [ Html.br [] []
@@ -455,22 +455,22 @@ gameEnded model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model.checkers, model.point ) of
-        ( C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves ct, p ) ->
+        ( C (Board b (BS bords cs pr xOld yOld)) p1 p2 cp moves ct, p ) ->
             case msg of
                 Click pNew ->
                     let
                         pl =
-                            physicalToLogical (PL pNew.x pNew.y) (BS cs pr xOld yOld)
+                            physicalToLogical (PL pNew.x pNew.y) (BS bords cs pr xOld yOld)
 
                         newTile =
-                            boardRef (C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves ct) pl
+                            boardRef (C (Board b (BS bords cs pr xOld yOld)) p1 p2 cp moves ct) pl
 
                         curTile =
                             unwrapTile ct
                     in
                     if equalTiles newTile curTile then
                         ( { model
-                            | checkers = C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves Nothing
+                            | checkers = C (Board b (BS bords cs pr xOld yOld)) p1 p2 cp moves Nothing
                             , point = pNew
                           }
                         , Cmd.none
@@ -482,7 +482,7 @@ update msg model =
                 -- update if game ended after move
                 Offset (x :: y :: _) ->
                     ( { model
-                        | checkers = C (Board b (BS cs pr x y)) p1 p2 cp moves ct
+                        | checkers = C (Board b (BS bords cs pr x y)) p1 p2 cp moves ct
                         , point = p
                       }
                     , Cmd.none

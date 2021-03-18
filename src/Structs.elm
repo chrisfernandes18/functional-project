@@ -43,8 +43,12 @@ type alias MarginSizeY {- amount of margin around board -} =
     Float
 
 
+type alias BorderSize {- the border-size around board -} =
+    Float
+
+
 type BoardSpec
-    = BS CellSize PieceRadius MarginSizeX MarginSizeY
+    = BS BorderSize CellSize PieceRadius MarginSizeX MarginSizeY
 
 
 type Board

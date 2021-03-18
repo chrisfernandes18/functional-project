@@ -1,8 +1,11 @@
 module Logic exposing
     ( boardRef
+    , checkBot
+    , endGame
     , equalColors
     , equalTiles
     , logicalToPhysical
+    , makeBotMove
     , movePiece
     , newBoard
     , physicalToLogical
@@ -11,15 +14,12 @@ module Logic exposing
     , testEndGame2
     , testEndGame3
     , testEndGameFalse
-    , endGame
-    , checkBot
-    , makeBotMove
     )
 
 import Array exposing (Array)
-import Structs exposing (..)
 import List
 import Random
+import Structs exposing (..)
 
 
 
@@ -503,117 +503,208 @@ movePiece c (LL newRow newCol) t =
         Nothing
 
 
+
 -- returns whether the tile is of the given color
+
+
 tileGivenColor : Tile -> Color -> Bool
 tileGivenColor t c1 =
-    case t of 
-        E -> False
-        Piece c2 _ _ -> equalColors c1 c2
+    case t of
+        E ->
+            False
+
+        Piece c2 _ _ ->
+            equalColors c1 c2
+
+
 
 -- get all the tiles of a current player
+
+
 getPlayerTiles : Array (Array Tile) -> Color -> Array Tile
-getPlayerTiles board c = 
-    let 
-        playerTiles = (\row -> Array.filter (\tile -> (tileGivenColor tile c)) row)
-    in 
-        Array.foldr (\row output -> (Array.append (playerTiles row) output)) Array.empty board
+getPlayerTiles board c =
+    let
+        playerTiles =
+            \row -> Array.filter (\tile -> tileGivenColor tile c) row
+    in
+    Array.foldr (\row output -> Array.append (playerTiles row) output) Array.empty board
+
 
 
 -- return the four potential inc. moves from r, c
+
+
 getIncLL : Int -> Int -> List LogicalLoc
-getIncLL r c = 
-    let 
-        incLeft = LL (r+1) (c-1)
-        incRight = LL (r+1) (c+1)
-        capIncLeft = LL (r+2) (c-2)
-        capIncRight = LL (r+2) (c+2)
-    in 
-        [incLeft, incRight, capIncLeft, capIncRight]
+getIncLL r c =
+    let
+        incLeft =
+            LL (r + 1) (c - 1)
+
+        incRight =
+            LL (r + 1) (c + 1)
+
+        capIncLeft =
+            LL (r + 2) (c - 2)
+
+        capIncRight =
+            LL (r + 2) (c + 2)
+    in
+    [ incLeft, incRight, capIncLeft, capIncRight ]
+
+
 
 -- return the four potential dec. moves from r, c
+
+
 getDecLL : Int -> Int -> List LogicalLoc
-getDecLL r c = 
-    let 
-        decLeft = LL (r-1) (c-1)
-        decRight = LL (r-1) (c+1)
-        capDecLeft = LL (r-2) (c-2)
-        capDecRight = LL (r-2) (c+2)
-    in 
-        [decLeft, decRight, capDecLeft, capDecRight]
+getDecLL r c =
+    let
+        decLeft =
+            LL (r - 1) (c - 1)
+
+        decRight =
+            LL (r - 1) (c + 1)
+
+        capDecLeft =
+            LL (r - 2) (c - 2)
+
+        capDecRight =
+            LL (r - 2) (c + 2)
+    in
+    [ decLeft, decRight, capDecLeft, capDecRight ]
+
 
 
 -- return the 8 potential moves from r, c
-getBothLL : Int -> Int -> List LogicalLoc 
-getBothLL r c = 
-    (getIncLL r c) ++ (getDecLL r c)
+
+
+getBothLL : Int -> Int -> List LogicalLoc
+getBothLL r c =
+    getIncLL r c ++ getDecLL r c
+
+
 
 -- taking current board and location of a piece, return valid moves
-getLegalMoves : Checkers -> Tile -> List (LogicalLoc, Tile)
+
+
+getLegalMoves : Checkers -> Tile -> List ( LogicalLoc, Tile )
 getLegalMoves checkers tile =
-    case tile of 
-        E -> []
+    case tile of
+        E ->
+            []
+
         Piece _ (LL r c) move ->
-            let 
-                llocLegal = (\lloc -> legalMove checkers lloc tile)
-                addTile = (\lloc -> (lloc, tile))
-                wrapList = (\lst -> List.map addTile (List.filter llocLegal lst))
-            in case move of 
-                Inc -> wrapList (getIncLL r c)
-                Dec -> wrapList (getDecLL r c)
-                Both -> wrapList (getBothLL r c)
+            let
+                llocLegal =
+                    \lloc -> legalMove checkers lloc tile
+
+                addTile =
+                    \lloc -> ( lloc, tile )
+
+                wrapList =
+                    \lst -> List.map addTile (List.filter llocLegal lst)
+            in
+            case move of
+                Inc ->
+                    wrapList (getIncLL r c)
+
+                Dec ->
+                    wrapList (getDecLL r c)
+
+                Both ->
+                    wrapList (getBothLL r c)
+
+
 
 -- given a board, get all legal moves for a player
-getAllLegalMoves : Checkers -> List (LogicalLoc, Tile)
-getAllLegalMoves checkers = 
-    case checkers of 
-        (C (Board board _ ) _ _ currPlayer _ _ ) -> 
+
+
+getAllLegalMoves : Checkers -> List ( LogicalLoc, Tile )
+getAllLegalMoves checkers =
+    case checkers of
+        C (Board board _) _ _ currPlayer _ _ ->
             let
-                tiles = Array.toList (getPlayerTiles board currPlayer)
-                moves = (\tile -> getLegalMoves checkers tile)
+                tiles =
+                    Array.toList (getPlayerTiles board currPlayer)
+
+                moves =
+                    \tile -> getLegalMoves checkers tile
             in
-                List.concatMap moves tiles
+            List.concatMap moves tiles
+
+
 
 -- check that given player is robot
+
+
 checkBot : Maybe Player -> Bool
-checkBot p = 
-    case p of 
-        Just (Robot _ _) -> True
-        _ -> False
+checkBot p =
+    case p of
+        Just (Robot _ _) ->
+            True
+
+        _ ->
+            False
+
+
 
 -- given a board, select make a random move
+
+
 makeBotMove : Checkers -> Maybe Checkers
-makeBotMove checkers = 
-    let 
-        legalMoves = getAllLegalMoves checkers
-        (randomLLoc, randomTile) = 
-            case List.head legalMoves of -- just pick first move for now
-                Just (l, t) -> (l, t)
-                Nothing -> (LL 0 0, E)
-    in -- consider black player1, red player2
-        if List.isEmpty legalMoves then Nothing 
-        else case checkers of 
-            -- assume only given with correct inputs 
-            (C _ _ _ B _ _) -> movePiece checkers randomLLoc randomTile 
-            (C _ _ _ R _ _) -> movePiece checkers randomLLoc randomTile 
+makeBotMove checkers =
+    let
+        legalMoves =
+            getAllLegalMoves checkers
+
+        ( randomLLoc, randomTile ) =
+            case List.head legalMoves of
+                -- just pick first move for now
+                Just ( l, t ) ->
+                    ( l, t )
+
+                Nothing ->
+                    ( LL 0 0, E )
+    in
+    -- consider black player1, red player2
+    if List.isEmpty legalMoves then
+        Nothing
+
+    else
+        case checkers of
+            -- assume only given with correct inputs
+            C _ _ _ B _ _ ->
+                movePiece checkers randomLLoc randomTile
+
+            C _ _ _ R _ _ ->
+                movePiece checkers randomLLoc randomTile
 
 
 endGame : Checkers -> Bool
-endGame checkers = 
-    case checkers of 
-        (C (Board board _) _ _ currPlayer _ _) -> 
+endGame checkers =
+    case checkers of
+        C (Board board _) _ _ currPlayer _ _ ->
             let
                 -- rowContains? is True if one row has one element of curPlayer
-                currentPlayerTile = (\tile -> (tileGivenColor tile currPlayer))
+                currentPlayerTile =
+                    \tile -> tileGivenColor tile currPlayer
+
                 rowContains =
                     \row -> not (Array.isEmpty (Array.filter currentPlayerTile row))
 
                 containsArr =
                     Array.map rowContains board
             in
-                if Array.foldr (||) False containsArr then
-                    List.isEmpty (getAllLegalMoves checkers)
-                else
-                    True -- no more pieces left
+            if Array.foldr (||) False containsArr then
+                List.isEmpty (getAllLegalMoves checkers)
+
+            else
+                True
+
+
+
+-- no more pieces left
+
 
 testCheckers : Checkers
 testCheckers =
@@ -621,47 +712,109 @@ testCheckers =
     C (Board (newBoard 8) (BS 70 30 10 10)) Nothing Nothing B 0 Nothing
 
 
--- test game where one player has no pieces
-testEndGame : Checkers
-testEndGame = 
-    C (Board (Array.fromList 
-                [Array.fromList [E,Piece R (LL 0 1) Both,E,Piece R (LL 0 3) Both,E,E,E,E],
-                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,Piece R (LL 2 3) Dec,E,E,E,E],
-                Array.fromList [E,E,Piece R (LL 3 2) Dec,E,E,E,E,E],Array.fromList [E,E,E,E,E,E,E,E],
-                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,E,E,E,E,E],
-                Array.fromList [Piece R (LL 7 0) Dec,E,Piece R (LL 7 2) Dec,E,E,E,Piece R (LL 7 6) Dec,E]])
-        (BS 70 30 360 98)) Nothing Nothing B 0 Nothing
 
--- another test end game where black has no moves 
+-- test game where one player has no pieces
+
+
+testEndGame : Checkers
+testEndGame =
+    C
+        (Board
+            (Array.fromList
+                [ Array.fromList [ E, Piece R (LL 0 1) Both, E, Piece R (LL 0 3) Both, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, Piece R (LL 2 3) Dec, E, E, E, E ]
+                , Array.fromList [ E, E, Piece R (LL 3 2) Dec, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, E, E, Piece R (LL 7 6) Dec, E ]
+                ]
+            )
+            (BS 70 30 360 98)
+        )
+        Nothing
+        Nothing
+        B
+        0
+        Nothing
+
+
+
+-- another test end game where black has no moves
+
+
 testEndGame2 : Checkers
-testEndGame2 = 
-    C (Board (Array.fromList 
-                [Array.fromList [E,Piece R (LL 0 1) Both,E,E,E,E,E,E],
-                Array.fromList [E,E,Piece R (LL 1 2) Dec,E,E,E,E,E],
-                Array.fromList [E,E,E,E,E,Piece R (LL 2 5) Dec,E,Piece B (LL 2 7) Inc],
-                Array.fromList [E,E,E,E,E,E,Piece B (LL 3 6) Inc,E],
-                Array.fromList [E,E,E,E,E,Piece R (LL 4 5) Dec,E,Piece R (LL 4 7) Dec],
-                Array.fromList [E,E,E,E,Piece R (LL 5 4) Dec,E,Piece R (LL 5 6) Dec,E],
-                Array.fromList [E,E,E,E,E,Piece R (LL 6 5) Dec,E,E],Array.fromList [E,E,E,E,E,E,E,E]]) 
-        (BS 70 30 360 98)) Nothing Nothing B 0 Nothing
+testEndGame2 =
+    C
+        (Board
+            (Array.fromList
+                [ Array.fromList [ E, Piece R (LL 0 1) Both, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, Piece R (LL 1 2) Dec, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, Piece R (LL 2 5) Dec, E, Piece B (LL 2 7) Inc ]
+                , Array.fromList [ E, E, E, E, E, E, Piece B (LL 3 6) Inc, E ]
+                , Array.fromList [ E, E, E, E, E, Piece R (LL 4 5) Dec, E, Piece R (LL 4 7) Dec ]
+                , Array.fromList [ E, E, E, E, Piece R (LL 5 4) Dec, E, Piece R (LL 5 6) Dec, E ]
+                , Array.fromList [ E, E, E, E, E, Piece R (LL 6 5) Dec, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                ]
+            )
+            (BS 70 30 360 98)
+        )
+        Nothing
+        Nothing
+        B
+        0
+        Nothing
+
 
 testEndGame3 : Checkers
-testEndGame3 = 
-    C (Board (Array.fromList 
-                [Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,E,Piece B (LL 1 4) Both,E,Piece B (LL 1 6) Inc,E],
-                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,E,E,E,E,E],
-                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,Piece B (LL 5 2) Inc,E,E,E,E,E],
-                Array.fromList [E,E,E,Piece B (LL 6 3) Inc,E,Piece B (LL 6 5) Inc,E,E],
-                Array.fromList [E,E,E,E,Piece B (LL 7 4) Both,E,E,E]]) 
-            (BS 70 30 360 79)) Nothing Nothing R 0 Nothing
+testEndGame3 =
+    C
+        (Board
+            (Array.fromList
+                [ Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, Piece B (LL 1 4) Both, E, Piece B (LL 1 6) Inc, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, Piece B (LL 5 2) Inc, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, Piece B (LL 6 3) Inc, E, Piece B (LL 6 5) Inc, E, E ]
+                , Array.fromList [ E, E, E, E, Piece B (LL 7 4) Both, E, E, E ]
+                ]
+            )
+            (BS 70 30 360 79)
+        )
+        Nothing
+        Nothing
+        R
+        0
+        Nothing
 
--- false end game - move for black 
+
+
+-- false end game - move for black
+
+
 testEndGameFalse : Checkers
-testEndGameFalse = 
-    C (Board (Array.fromList 
-                [Array.fromList [E,Piece B (LL 0 1) Both,E,Piece R (LL 0 3) Both,E,E,E,E],
-                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,Piece R (LL 2 3) Dec,E,E,E,E],
-                Array.fromList [E,E,Piece R (LL 3 2) Dec,E,E,E,E,E],Array.fromList [E,E,E,E,E,E,E,E],
-                Array.fromList [E,E,E,E,E,E,E,E],Array.fromList [E,E,E,E,E,E,E,E],
-                Array.fromList [Piece R (LL 7 0) Dec,E,Piece R (LL 7 2) Dec,E,E,E,Piece R (LL 7 6) Dec,E]])
-        (BS 70 30 360 98)) Nothing Nothing B 0 Nothing
+testEndGameFalse =
+    C
+        (Board
+            (Array.fromList
+                [ Array.fromList [ E, Piece B (LL 0 1) Both, E, Piece R (LL 0 3) Both, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, Piece R (LL 2 3) Dec, E, E, E, E ]
+                , Array.fromList [ E, E, Piece R (LL 3 2) Dec, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ E, E, E, E, E, E, E, E ]
+                , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, E, E, Piece R (LL 7 6) Dec, E ]
+                ]
+            )
+            (BS 70 30 360 98)
+        )
+        Nothing
+        Nothing
+        B
+        0
+        Nothing

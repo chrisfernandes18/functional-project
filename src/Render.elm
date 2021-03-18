@@ -6,18 +6,17 @@ import Array
 import Browser
 import Browser.Events
 import Debug
-import Http exposing (..)
 import Html exposing (..)
-import Html exposing (Html)
 import Html.Attributes as HAttrs
 import Html.Events as HEvents
+import Http exposing (..)
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Utils
 import Logic exposing (..)
 import Structs exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs
+import Utils
 
 
 
@@ -28,8 +27,10 @@ type alias Point =
     { x : Float, y : Float }
 
 
+
 -- type Model
 --    = M Checkers Point
+
 
 type alias Model =
     { checkers : Checkers
@@ -39,12 +40,14 @@ type alias Model =
     , player2 : Maybe Player
     }
 
+
 type Msg
     = Click Point
     | Offset (List Float)
-    -- | SubmitForm
-    | UpdatePlayer1 String 
+      -- | SubmitForm
+    | UpdatePlayer1 String
     | UpdatePlayer2 String
+
 
 type alias Flags =
     ()
@@ -96,6 +99,7 @@ initModel =
     , player1 = Just (Human "" B)
     , player2 = Just (Human "" R)
     }
+
 
 boardToHTML : Board -> Maybe Tile -> Html Msg
 boardToHTML b til =
@@ -273,12 +277,18 @@ boardToHTML b til =
 
 view : Model -> Html Msg
 view model =
-    case (model.checkers, model.point) of
-        (C (Board b (BS cs pr mx my)) p1 p2 cp moves ct, p) ->
+    case ( model.checkers, model.point ) of
+        ( C (Board b (BS cs pr mx my)) p1 p2 cp moves ct, p ) ->
             let
                 everything =
                     Debug.toString model
-                endText = if model.gameOver then "Game over" else ""
+
+                endText =
+                    if model.gameOver then
+                        "Game over"
+
+                    else
+                        ""
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
@@ -290,6 +300,7 @@ view model =
                 , Html.form
                     [ HAttrs.id "players" ]
                     [ Html.br [] []
+
                     -- Html.input
                     --     [ HAttrs.type_ "text", HAttrs.name "player1", HAttrs.placeholder "Player 1" ]
                     --     []
@@ -307,6 +318,7 @@ view model =
                         [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
                         , Html.option [ HAttrs.value "bot" ] [ Html.text "Bot" ]
                         ]
+
                     -- , Html.br [] []
                     -- , Html.button
                     --     [ HEvents.onClick SubmitForm ]
@@ -318,110 +330,214 @@ view model =
                 ]
 
 
+
 -- given a maybe tile, returns a tile
-unwrapTile : Maybe Tile -> Tile 
-unwrapTile mt = 
-    case mt of 
-        Nothing -> E
-        Just t -> t 
+
+
+unwrapTile : Maybe Tile -> Tile
+unwrapTile mt =
+    case mt of
+        Nothing ->
+            E
+
+        Just t ->
+            t
+
+
 
 -- given a tile, returns a maybe tile
-wrapTile : Tile -> Maybe Tile
-wrapTile t = 
-    case t of 
-        E -> Nothing
-        Piece c l m -> Just (Piece c l m)
 
--- given the current tile, new tile, and model, make move 
-moveTo : Tile -> Model -> Msg -> Model 
-moveTo nt model msg =   
-    case (model.checkers, msg) of
-        (C (Board b bs) p1 p2 cp moves ct, Click p) -> 
-            let 
-                pl = physicalToLogical (PL p.x p.y) bs
-                unchanged = { model | 
-                            checkers = C (Board b bs) p1 p2 cp moves ct
-                            , point = p }
-                ctToNt = { model | 
-                         checkers = C (Board b bs) p1 p2 cp moves (wrapTile nt)
-                         , point = p }
-                curTile = unwrapTile ct
-            in case (nt, ct) of 
-                ((Piece color _ _), Nothing) -> 
-                    if equalColors color cp 
-                    then ctToNt 
-                    else unchanged
-                ((Piece color _ _ ), _) -> 
-                    if equalColors color cp 
-                    then 
+
+wrapTile : Tile -> Maybe Tile
+wrapTile t =
+    case t of
+        E ->
+            Nothing
+
+        Piece c l m ->
+            Just (Piece c l m)
+
+
+
+-- given the current tile, new tile, and model, make move
+
+
+moveTo : Tile -> Model -> Msg -> Model
+moveTo nt model msg =
+    case ( model.checkers, msg ) of
+        ( C (Board b bs) p1 p2 cp moves ct, Click p ) ->
+            let
+                pl =
+                    physicalToLogical (PL p.x p.y) bs
+
+                unchanged =
+                    { model
+                        | checkers = C (Board b bs) p1 p2 cp moves ct
+                        , point = p
+                    }
+
+                ctToNt =
+                    { model
+                        | checkers = C (Board b bs) p1 p2 cp moves (wrapTile nt)
+                        , point = p
+                    }
+
+                curTile =
+                    unwrapTile ct
+            in
+            case ( nt, ct ) of
+                ( Piece color _ _, Nothing ) ->
+                    if equalColors color cp then
+                        ctToNt
+
+                    else
+                        unchanged
+
+                ( Piece color _ _, _ ) ->
+                    if equalColors color cp then
                         case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
-                            Nothing -> unchanged 
-                            Just newC -> { model | checkers = newC, point = p }
-                    else unchanged
-                (_, Nothing) -> ctToNt 
-                (E, _) -> 
+                            Nothing ->
+                                unchanged
+
+                            Just newC ->
+                                { model | checkers = newC, point = p }
+
+                    else
+                        unchanged
+
+                ( _, Nothing ) ->
+                    ctToNt
+
+                ( E, _ ) ->
                     case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
-                        Nothing -> unchanged
-                        Just newC -> { model | checkers = newC, point = p }
-        (_, _) -> model
+                        Nothing ->
+                            unchanged
+
+                        Just newC ->
+                            { model | checkers = newC, point = p }
+
+        ( _, _ ) ->
+            model
+
+
 
 -- check whether we need to make a bot move
+
+
 updateBotMove : Model -> Model
-updateBotMove model = 
-    case model.checkers of 
-        (C _ _ _ B _ _) -> 
-            if checkBot model.player1 then 
+updateBotMove model =
+    case model.checkers of
+        C _ _ _ B _ _ ->
+            if checkBot model.player1 then
                 case makeBotMove model.checkers of
-                    Nothing -> model
-                    Just c ->  { model | checkers = c } 
-            else model
-        (C _ _ _ R _ _) -> 
-            if checkBot model.player2 then 
-                case makeBotMove model.checkers of 
-                    Nothing -> model 
-                    Just c -> { model | checkers = c }
-            else model
+                    Nothing ->
+                        model
+
+                    Just c ->
+                        { model | checkers = c }
+
+            else
+                model
+
+        C _ _ _ R _ _ ->
+            if checkBot model.player2 then
+                case makeBotMove model.checkers of
+                    Nothing ->
+                        model
+
+                    Just c ->
+                        { model | checkers = c }
+
+            else
+                model
+
+
 
 -- check whether the game has ended
+
+
 gameEnded : Model -> Model
-gameEnded model = 
-    if endGame model.checkers
-    then { model | gameOver = True }
-    else model 
+gameEnded model =
+    if endGame model.checkers then
+        { model | gameOver = True }
+
+    else
+        model
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case (model.checkers, model.point) of 
-        (C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves ct, p) -> 
-            case msg of 
-                Click pNew -> 
+    case ( model.checkers, model.point ) of
+        ( C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves ct, p ) ->
+            case msg of
+                Click pNew ->
                     let
-                        pl = physicalToLogical (PL pNew.x pNew.y) (BS cs pr xOld yOld)
-                        newTile = boardRef (C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves ct) pl
-                        curTile = unwrapTile ct
+                        pl =
+                            physicalToLogical (PL pNew.x pNew.y) (BS cs pr xOld yOld)
+
+                        newTile =
+                            boardRef (C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves ct) pl
+
+                        curTile =
+                            unwrapTile ct
                     in
                     if equalTiles newTile curTile then
-                        ({ model | checkers = C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves Nothing 
-                        , point = pNew}, Cmd.none)
-                    else 
-                        ((gameEnded (updateBotMove (moveTo newTile model msg))), Cmd.none) -- update if game ended after move
-                Offset (x :: y :: _) -> ({ model | 
-                                         checkers = C (Board b (BS cs pr x y)) p1 p2 cp moves ct
-                                         , point = p }, Cmd.none)
-                UpdatePlayer1 p1s -> ({ model | player1 = playerStrToP p1s "" 1 }, Cmd.none)
-                UpdatePlayer2 p2s -> ({ model | player2 = playerStrToP p2s "" 2 }, Cmd.none)
-                _ -> (model, Cmd.none)
+                        ( { model
+                            | checkers = C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves Nothing
+                            , point = pNew
+                          }
+                        , Cmd.none
+                        )
 
--- transform player string to player type 
--- we will make the black player = player 1 
+                    else
+                        ( gameEnded (updateBotMove (moveTo newTile model msg)), Cmd.none )
+
+                -- update if game ended after move
+                Offset (x :: y :: _) ->
+                    ( { model
+                        | checkers = C (Board b (BS cs pr x y)) p1 p2 cp moves ct
+                        , point = p
+                      }
+                    , Cmd.none
+                    )
+
+                UpdatePlayer1 p1s ->
+                    ( { model | player1 = playerStrToP p1s "" 1 }, Cmd.none )
+
+                UpdatePlayer2 p2s ->
+                    ( { model | player2 = playerStrToP p2s "" 2 }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+
+
+-- transform player string to player type
+-- we will make the black player = player 1
+
+
 playerStrToP : String -> String -> Int -> Maybe Player
-playerStrToP s name num = 
-    case (s, num) of
-        ("human", 1) -> Just (Human name B)
-        ("human", 2) -> Just (Human name R)
-        ("bot", 1) -> Just (Robot name B)
-        ("bot", 2) -> Just (Robot name R)
-        _ -> Nothing -- should not happen but default Nothing
+playerStrToP s name num =
+    case ( s, num ) of
+        ( "human", 1 ) ->
+            Just (Human name B)
+
+        ( "human", 2 ) ->
+            Just (Human name R)
+
+        ( "bot", 1 ) ->
+            Just (Robot name B)
+
+        ( "bot", 2 ) ->
+            Just (Robot name R)
+
+        _ ->
+            Nothing
+
+
+
+-- should not happen but default Nothing
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =

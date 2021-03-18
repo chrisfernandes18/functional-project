@@ -367,17 +367,29 @@ moveTo nt model msg =
                         Just newC -> { model | checkers = newC, point = p }
         (_, _) -> model
 
+-- check whether we need to make a bot move
+updateBotMove : Model -> Model
+updateBotMove model = 
+    case model.checkers of 
+        (C _ _ _ B _ _) -> 
+            if checkBot model.player1 then 
+                case makeBotMove model.checkers of
+                    Nothing -> model
+                    Just c ->  { model | checkers = c } 
+            else model
+        (C _ _ _ R _ _) -> 
+            if checkBot model.player2 then 
+                case makeBotMove model.checkers of 
+                    Nothing -> model 
+                    Just c -> { model | checkers = c }
+            else model
+
 -- check whether the game has ended
 gameEnded : Model -> Model
 gameEnded model = 
     if endGame model.checkers
     then { model | gameOver = True }
     else model 
-
--- make a modve for the robot 
--- botMove : Model -> Model 
--- botMove model = 
-
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -394,14 +406,12 @@ update msg model =
                         ({ model | checkers = C (Board b (BS cs pr xOld yOld)) p1 p2 cp moves Nothing 
                         , point = pNew}, Cmd.none)
                     else 
-                        ((gameEnded (moveTo newTile model msg)), Cmd.none) -- update if game ended after move
+                        ((gameEnded (updateBotMove (moveTo newTile model msg))), Cmd.none) -- update if game ended after move
                 Offset (x :: y :: _) -> ({ model | 
                                          checkers = C (Board b (BS cs pr x y)) p1 p2 cp moves ct
                                          , point = p }, Cmd.none)
                 UpdatePlayer1 p1s -> ({ model | player1 = playerStrToP p1s "" 1 }, Cmd.none)
                 UpdatePlayer2 p2s -> ({ model | player2 = playerStrToP p2s "" 2 }, Cmd.none)
-                -- UpdatePlayer1 p1s -> (updatePlayer1 p1s model, Cmd.none )
-                -- UpdatePlayer2 p2s -> (updatePlayer2 p2s model, Cmd.none )
                 _ -> (model, Cmd.none)
 
 -- transform player string to player type 
@@ -413,8 +423,7 @@ playerStrToP s name num =
         ("human", 2) -> Just (Human name R)
         ("bot", 1) -> Just (Robot name B)
         ("bot", 2) -> Just (Robot name R)
-        -- TODO: change this to nothing
-        _ -> Just (Human name B) -- should not happen but default bot
+        _ -> Nothing -- should not happen but default Nothing
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =

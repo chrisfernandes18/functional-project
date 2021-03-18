@@ -12,11 +12,14 @@ module Logic exposing
     , testEndGame3
     , testEndGameFalse
     , endGame
+    , checkBot
+    , makeBotMove
     )
 
 import Array exposing (Array)
 import Structs exposing (..)
 import List
+import Random
 
 
 
@@ -545,19 +548,22 @@ getBothLL r c =
     (getIncLL r c) ++ (getDecLL r c)
 
 -- taking current board and location of a piece, return valid moves
-getLegalMoves : Checkers -> Tile -> List LogicalLoc
+getLegalMoves : Checkers -> Tile -> List (LogicalLoc, Tile)
 getLegalMoves checkers tile =
     case tile of 
         E -> []
         Piece _ (LL r c) move ->
-            let llocLegal = (\lloc -> legalMove checkers lloc tile)
+            let 
+                llocLegal = (\lloc -> legalMove checkers lloc tile)
+                addTile = (\lloc -> (lloc, tile))
+                wrapList = (\lst -> List.map addTile (List.filter llocLegal lst))
             in case move of 
-                Inc -> (List.filter llocLegal (getIncLL r c))
-                Dec -> (List.filter llocLegal (getDecLL r c))
-                Both -> (List.filter llocLegal (getBothLL r c))
+                Inc -> wrapList (getIncLL r c)
+                Dec -> wrapList (getDecLL r c)
+                Both -> wrapList (getBothLL r c)
 
 -- given a board, get all legal moves for a player
-getAllLegalMoves : Checkers -> List LogicalLoc
+getAllLegalMoves : Checkers -> List (LogicalLoc, Tile)
 getAllLegalMoves checkers = 
     case checkers of 
         (C (Board board _ ) _ _ currPlayer _ _ ) -> 
@@ -566,6 +572,30 @@ getAllLegalMoves checkers =
                 moves = (\tile -> getLegalMoves checkers tile)
             in
                 List.concatMap moves tiles
+
+-- check that given player is robot
+checkBot : Maybe Player -> Bool
+checkBot p = 
+    case p of 
+        Just (Robot _ _) -> True
+        _ -> False
+
+-- given a board, select make a random move
+makeBotMove : Checkers -> Maybe Checkers
+makeBotMove checkers = 
+    let 
+        legalMoves = getAllLegalMoves checkers
+        (randomLLoc, randomTile) = 
+            case List.head legalMoves of -- just pick first move for now
+                Just (l, t) -> (l, t)
+                Nothing -> (LL 0 0, E)
+    in -- consider black player1, red player2
+        if List.isEmpty legalMoves then Nothing 
+        else case checkers of 
+            -- assume only given with correct inputs 
+            (C _ _ _ B _ _) -> movePiece checkers randomLLoc randomTile 
+            (C _ _ _ R _ _) -> movePiece checkers randomLLoc randomTile 
+
 
 endGame : Checkers -> Bool
 endGame checkers = 

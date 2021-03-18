@@ -6256,21 +6256,24 @@ var $author$project$Logic$getLegalMoves = F2(
 			var llocLegal = function (lloc) {
 				return A3($author$project$Logic$legalMove, checkers, lloc, tile);
 			};
+			var addTile = function (lloc) {
+				return _Utils_Tuple2(lloc, tile);
+			};
+			var wrapList = function (lst) {
+				return A2(
+					$elm$core$List$map,
+					addTile,
+					A2($elm$core$List$filter, llocLegal, lst));
+			};
 			switch (move.$) {
 				case 'Inc':
-					return A2(
-						$elm$core$List$filter,
-						llocLegal,
+					return wrapList(
 						A2($author$project$Logic$getIncLL, r, c));
 				case 'Dec':
-					return A2(
-						$elm$core$List$filter,
-						llocLegal,
+					return wrapList(
 						A2($author$project$Logic$getDecLL, r, c));
 				default:
-					return A2(
-						$elm$core$List$filter,
-						llocLegal,
+					return wrapList(
 						A2($author$project$Logic$getBothLL, r, c));
 			}
 		}
@@ -6945,9 +6948,88 @@ var $author$project$Render$playerStrToP = F3(
 					break _v0$4;
 			}
 		}
-		return $elm$core$Maybe$Just(
-			A2($author$project$Structs$Human, name, $author$project$Structs$B));
+		return $elm$core$Maybe$Nothing;
 	});
+var $author$project$Logic$checkBot = function (p) {
+	if ((p.$ === 'Just') && (p.a.$ === 'Robot')) {
+		var _v1 = p.a;
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Logic$makeBotMove = function (checkers) {
+	var legalMoves = $author$project$Logic$getAllLegalMoves(checkers);
+	var _v0 = function () {
+		var _v1 = $elm$core$List$head(legalMoves);
+		if (_v1.$ === 'Just') {
+			var _v2 = _v1.a;
+			var l = _v2.a;
+			var t = _v2.b;
+			return _Utils_Tuple2(l, t);
+		} else {
+			return _Utils_Tuple2(
+				A2($author$project$Structs$LL, 0, 0),
+				$author$project$Structs$E);
+		}
+	}();
+	var randomLLoc = _v0.a;
+	var randomTile = _v0.b;
+	if ($elm$core$List$isEmpty(legalMoves)) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		if (checkers.d.$ === 'B') {
+			var _v4 = checkers.d;
+			return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
+		} else {
+			var _v5 = checkers.d;
+			return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
+		}
+	}
+};
+var $author$project$Render$updateBotMove = function (model) {
+	var _v0 = model.checkers;
+	if (_v0.d.$ === 'B') {
+		var _v1 = _v0.d;
+		if ($author$project$Logic$checkBot(model.player1)) {
+			var _v2 = $author$project$Logic$makeBotMove(model.checkers);
+			if (_v2.$ === 'Nothing') {
+				return model;
+			} else {
+				var c = _v2.a;
+				return _Utils_update(
+					model,
+					{checkers: c});
+			}
+		} else {
+			return model;
+		}
+	} else {
+		var _v3 = _v0.d;
+		if ($author$project$Logic$checkBot(model.player2)) {
+			var _v4 = $author$project$Logic$makeBotMove(model.checkers);
+			if (_v4.$ === 'Nothing') {
+				return model;
+			} else {
+				var c = _v4.a;
+				return _Utils_update(
+					model,
+					{checkers: c});
+			}
+		} else {
+			return model;
+		}
+	}
+};
 var $author$project$Render$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(model.checkers, model.point);
@@ -7008,7 +7090,8 @@ var $author$project$Render$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 						$author$project$Render$gameEnded(
-							A3($author$project$Render$moveTo, newTile, model, msg)),
+							$author$project$Render$updateBotMove(
+								A3($author$project$Render$moveTo, newTile, model, msg))),
 						$elm$core$Platform$Cmd$none);
 				case 'Offset':
 					if (msg.a.b && msg.a.b.b) {

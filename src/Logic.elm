@@ -539,7 +539,7 @@ getDecLL r c =
 
 
 -- return the 8 potential moves from r, c
-getBothLL : Int -> Int -> ListLogicalLoc 
+getBothLL : Int -> Int -> List LogicalLoc 
 getBothLL r c = 
     (getIncLL r c) ++ (getDecLL r c)
 

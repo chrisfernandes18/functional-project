@@ -304,6 +304,43 @@ unwrapTile mt =
         Nothing -> E
         Just t -> t 
 
+-- given a tile, returns a maybe tile
+wrapTile : Tile -> Maybe Tile
+wrapTile t = 
+    case t of 
+        E -> Nothing
+        Piece c l m -> Just (Piece c l m)
+
+-- given the current tile, new tile, and model, make move 
+moveTo : Tile -> Model -> Msg -> Model 
+moveTo nt (M (C (Board b bs) p1 p2 cp moves ct) oldpt) msg = 
+    case msg of
+        Click p -> 
+            let 
+                pl = physicalToLogical (PL p.x p.y) bs
+                unchanged = M (C (Board b bs) p1 p2 cp moves ct) p
+                ctToNt = M (C (Board b bs) p1 p2 cp moves (wrapTile nt)) p
+                curTile = unwrapTile ct
+            in case (nt, ct) of 
+                ((Piece color _ _), Nothing) -> 
+                    if equalColors color cp 
+                    then ctToNt 
+                    else unchanged
+                ((Piece color _ _ ), _) -> 
+                    if equalColors color cp 
+                    then 
+                        case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
+                            Nothing -> unchanged 
+                            Just newC -> M newC p
+                    else unchanged
+                (_, Nothing) -> ctToNt 
+                (E, _) -> 
+                    case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
+                        Nothing -> unchanged
+                        Just newC -> M newC p
+        _ -> M (C (Board b bs) p1 p2 cp moves ct) oldpt
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model, msg ) of
@@ -312,55 +349,15 @@ update msg model =
 
         ( M (C (Board b bs) p1 p2 cp moves ct) _, Click p ) ->
             let
-                pl =
-                    physicalToLogical (PL p.x p.y) bs
-
-                nt =
-                    case boardRef (C (Board b bs) p1 p2 cp moves ct) pl of
-                        E ->
-                            Nothing
-
-                        Piece c l m ->
-                            Just (Piece c l m)
-
-                newTile = unwrapTile nt
-
+                pl = physicalToLogical (PL p.x p.y) bs
+                newTile = boardRef (C (Board b bs) p1 p2 cp moves ct) pl
                 curTile = unwrapTile ct
             in
             if equalTiles newTile curTile then
                 ( M (C (Board b bs) p1 p2 cp moves Nothing) p, Cmd.none )
 
-            else
-                case newTile of
-                    Piece color _ _ ->
-                        if equalColors color cp then
-                            case ct of
-                                Nothing ->
-                                    ( M (C (Board b bs) p1 p2 cp moves nt) p, Cmd.none )
-
-                                _ ->
-                                    case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
-                                        Nothing ->
-                                            ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
-
-                                        Just newC ->
-                                            ( M newC p, Cmd.none ) -- update message here to check if end game
-
-                        else
-                            ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
-
-                    E ->
-                        case ct of
-                            Nothing ->
-                                ( M (C (Board b bs) p1 p2 cp moves nt) p, Cmd.none )
-
-                            _ ->
-                                case movePiece (C (Board b bs) p1 p2 cp moves ct) pl curTile of
-                                    Nothing ->
-                                        ( M (C (Board b bs) p1 p2 cp moves ct) p, Cmd.none )
-
-                                    Just newC ->
-                                        ( M newC p, Cmd.none ) -- update message here to check if end game
+            else 
+                ((moveTo newTile model msg), Cmd.none)
 
         ( M (C (Board b (BS cs pr _ _)) p1 p2 cp moves ct) p, Offset (x :: y :: _) ) ->
             ( M (C (Board b (BS cs pr x y)) p1 p2 cp moves ct) p, Cmd.none )

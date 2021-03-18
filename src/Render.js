@@ -7047,31 +7047,57 @@ var $author$project$Render$update = F2(
 		var moves = _v1.e;
 		var ct = _v1.f;
 		var p = _v0.b;
-		_v4$4:
-		while (true) {
-			switch (msg.$) {
-				case 'Click':
-					var pNew = msg.a;
-					var pl = A2(
-						$author$project$Logic$physicalToLogical,
-						A2($author$project$Structs$PL, pNew.x, pNew.y),
-						A4($author$project$Structs$BS, cs, pr, xOld, yOld));
-					var newTile = A2(
-						$author$project$Logic$boardRef,
-						A6(
-							$author$project$Structs$C,
-							A2(
-								$author$project$Structs$Board,
-								b,
-								A4($author$project$Structs$BS, cs, pr, xOld, yOld)),
-							p1,
-							p2,
-							cp,
-							moves,
-							ct),
-						pl);
-					var curTile = $author$project$Render$unwrapTile(ct);
-					return A2($author$project$Logic$equalTiles, newTile, curTile) ? _Utils_Tuple2(
+		switch (msg.$) {
+			case 'Click':
+				var pNew = msg.a;
+				var pl = A2(
+					$author$project$Logic$physicalToLogical,
+					A2($author$project$Structs$PL, pNew.x, pNew.y),
+					A4($author$project$Structs$BS, cs, pr, xOld, yOld));
+				var newTile = A2(
+					$author$project$Logic$boardRef,
+					A6(
+						$author$project$Structs$C,
+						A2(
+							$author$project$Structs$Board,
+							b,
+							A4($author$project$Structs$BS, cs, pr, xOld, yOld)),
+						p1,
+						p2,
+						cp,
+						moves,
+						ct),
+					pl);
+				var curTile = $author$project$Render$unwrapTile(ct);
+				return A2($author$project$Logic$equalTiles, newTile, curTile) ? _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							checkers: A6(
+								$author$project$Structs$C,
+								A2(
+									$author$project$Structs$Board,
+									b,
+									A4($author$project$Structs$BS, cs, pr, xOld, yOld)),
+								p1,
+								p2,
+								cp,
+								moves,
+								$elm$core$Maybe$Nothing),
+							point: pNew
+						}),
+					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+					$author$project$Render$gameEnded(
+						$author$project$Render$updateBotMove(
+							A3($author$project$Render$moveTo, newTile, model, msg))),
+					$elm$core$Platform$Cmd$none);
+			case 'Offset':
+				if (msg.a.b && msg.a.b.b) {
+					var _v5 = msg.a;
+					var x = _v5.a;
+					var _v6 = _v5.b;
+					var y = _v6.a;
+					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
@@ -7080,71 +7106,38 @@ var $author$project$Render$update = F2(
 									A2(
 										$author$project$Structs$Board,
 										b,
-										A4($author$project$Structs$BS, cs, pr, xOld, yOld)),
+										A4($author$project$Structs$BS, cs, pr, x, y)),
 									p1,
 									p2,
 									cp,
 									moves,
-									$elm$core$Maybe$Nothing),
-								point: pNew
-							}),
-						$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
-						$author$project$Render$gameEnded(
-							$author$project$Render$updateBotMove(
-								A3($author$project$Render$moveTo, newTile, model, msg))),
-						$elm$core$Platform$Cmd$none);
-				case 'Offset':
-					if (msg.a.b && msg.a.b.b) {
-						var _v5 = msg.a;
-						var x = _v5.a;
-						var _v6 = _v5.b;
-						var y = _v6.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									checkers: A6(
-										$author$project$Structs$C,
-										A2(
-											$author$project$Structs$Board,
-											b,
-											A4($author$project$Structs$BS, cs, pr, x, y)),
-										p1,
-										p2,
-										cp,
-										moves,
-										ct),
-									point: p
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						break _v4$4;
-					}
-				case 'UpdatePlayer1':
-					var p1s = msg.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								player1: A3($author$project$Render$playerStrToP, p1s, '', 1)
+									ct),
+								point: p
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'UpdatePlayer2':
-					var p2s = msg.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								player2: A3($author$project$Render$playerStrToP, p2s, '', 2)
-							}),
-						$elm$core$Platform$Cmd$none);
-				default:
-					break _v4$4;
-			}
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'UpdatePlayer1':
+				var p1s = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							player1: A3($author$project$Render$playerStrToP, p1s, '', 1)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var p2s = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							player2: A3($author$project$Render$playerStrToP, p2s, '', 2)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
-		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
-var $author$project$Render$SubmitForm = {$: 'SubmitForm'};
 var $author$project$Render$UpdatePlayer1 = function (a) {
 	return {$: 'UpdatePlayer1', a: a};
 };
@@ -7471,34 +7464,15 @@ var $author$project$Render$boardToHTML = F2(
 			arrayLst);
 	});
 var $elm$html$Html$br = _VirtualDom_node('br');
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$form = _VirtualDom_node('form');
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -7526,11 +7500,9 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
 var $elm$html$Html$option = _VirtualDom_node('option');
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$select = _VirtualDom_node('select');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Render$view = function (model) {
 	var _v0 = _Utils_Tuple2(model.checkers, model.point);
@@ -7581,24 +7553,6 @@ var $author$project$Render$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$name('player1'),
-								$elm$html$Html$Attributes$placeholder('Player 1')
-							]),
-						_List_Nil),
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$name('player2'),
-								$elm$html$Html$Attributes$placeholder('Player 2')
-							]),
-						_List_Nil),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$select,
@@ -7659,17 +7613,6 @@ var $author$project$Render$view = function (model) {
 									[
 										$elm$html$Html$text('Bot')
 									]))
-							])),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Render$SubmitForm)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Submit')
 							]))
 					]))
 			]));

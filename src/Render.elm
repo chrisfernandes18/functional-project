@@ -42,12 +42,9 @@ type alias Model =
 type Msg
     = Click Point
     | Offset (List Float)
-    | SubmitForm
-    | Response (Result Http.Error String)
+    -- | SubmitForm
     | UpdatePlayer1 String 
     | UpdatePlayer2 String
-    -- | Response FormField String
-    -- | Info { p1 : String, p2 : String }
 
 type alias Flags =
     ()
@@ -292,13 +289,14 @@ view model =
                     [ boardToHTML (Board b (BS cs pr mx my)) ct ]
                 , Html.form
                     [ HAttrs.id "players" ]
-                    [ Html.input
-                        [ HAttrs.type_ "text", HAttrs.name "player1", HAttrs.placeholder "Player 1" ]
-                        []
-                    , Html.input
-                        [ HAttrs.type_ "text", HAttrs.name "player2", HAttrs.placeholder "Player 2" ]
-                        []
-                    , Html.br [] []
+                    [ Html.br [] []
+                    -- Html.input
+                    --     [ HAttrs.type_ "text", HAttrs.name "player1", HAttrs.placeholder "Player 1" ]
+                    --     []
+                    -- , Html.input
+                    --     [ HAttrs.type_ "text", HAttrs.name "player2", HAttrs.placeholder "Player 2" ]
+                    --     []
+                    -- , Html.br [] []
                     , Html.select
                         [ HAttrs.id "choice1", HEvents.onInput UpdatePlayer1 ]
                         [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
@@ -309,10 +307,10 @@ view model =
                         [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
                         , Html.option [ HAttrs.value "bot" ] [ Html.text "Bot" ]
                         ]
-                    , Html.br [] []
-                    , Html.button
-                        [ HEvents.onClick SubmitForm ]
-                        [ Html.text "Submit" ]
+                    -- , Html.br [] []
+                    -- , Html.button
+                    --     [ HEvents.onClick SubmitForm ]
+                    --     [ Html.text "Submit" ]
                     -- Html.input
                     --     [ HAttrs.type_ "submit" ]
                     --     []

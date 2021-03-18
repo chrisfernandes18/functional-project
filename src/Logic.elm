@@ -18,7 +18,6 @@ module Logic exposing
 
 import Array exposing (Array)
 import List
-import Random
 import Structs exposing (..)
 
 

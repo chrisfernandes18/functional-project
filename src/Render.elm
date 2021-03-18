@@ -11,12 +11,10 @@ import Html.Attributes as HAttrs
 import Html.Events as HEvents
 import Http exposing (..)
 import Json.Decode as Decode
-import Json.Encode as Encode
 import Logic exposing (..)
 import Structs exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs
-import Utils
 
 
 
@@ -278,7 +276,7 @@ boardToHTML b til =
 view : Model -> Html Msg
 view model =
     case ( model.checkers, model.point ) of
-        ( C (Board b (BS cs pr mx my)) p1 p2 cp moves ct, p ) ->
+        ( C (Board b (BS cs pr mx my)) _ _ _ _ ct, _ ) ->
             let
                 everything =
                     Debug.toString model

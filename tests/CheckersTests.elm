@@ -8,20 +8,22 @@ import Structs exposing (..)
 import Test exposing (..)
 
 
-testCheckers : Checkers
-testCheckers =
-    -- test game
-    C (Board (Logic.newBoard 8) (BS 70 30 10 10)) Nothing Nothing B 0 Nothing
-
-
 testBoardSpec : BoardSpec
 testBoardSpec =
+    -- test boardspec
     BS 70 30 10 10
 
 
 testBoard : Array (Array Tile)
 testBoard =
+    -- test 2d array
     Logic.newBoard 8
+
+
+testCheckers : Checkers
+testCheckers =
+    -- test game
+    C (Board testBoard testBoardSpec) Nothing Nothing B 0 Nothing
 
 
 
@@ -502,5 +504,53 @@ suite =
                     |> (\func ->
                             func input3
                        )
+                    |> Expect.equal expected
+        , Test.test "endGame no black pieces on board" <|
+            \() ->
+                let
+                    input =
+                        testEndGame
+
+                    expected =
+                        True
+                in
+                input
+                    |> Logic.endGame
+                    |> Expect.equal expected
+        , Test.test "endGame no red pieces on board" <|
+            \() ->
+                let
+                    input =
+                        testEndGame3
+
+                    expected =
+                        True
+                in
+                input
+                    |> Logic.endGame
+                    |> Expect.equal expected
+        , Test.test "endGame black has no moves left" <|
+            \() ->
+                let
+                    input =
+                        testEndGame2
+
+                    expected =
+                        True
+                in
+                input
+                    |> Logic.endGame
+                    |> Expect.equal expected
+        , Test.test "endGame black has valid moves left" <|
+            \() ->
+                let
+                    input =
+                        testEndGameFalse
+
+                    expected =
+                        False
+                in
+                input
+                    |> Logic.endGame
                     |> Expect.equal expected
         ]

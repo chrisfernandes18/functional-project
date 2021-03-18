@@ -9,11 +9,6 @@ module Logic exposing
     , movePiece
     , newBoard
     , physicalToLogical
-    , testCheckers
-    , testEndGame
-    , testEndGame2
-    , testEndGame3
-    , testEndGameFalse
     )
 
 import Array exposing (Array)
@@ -23,44 +18,6 @@ import Structs exposing (..)
 
 
 {-------------------------- Helper Functions --------------------------}
-
-
-equalColors : Color -> Color -> Bool
-equalColors c1 c2 =
-    case ( c1, c2 ) of
-        ( B, B ) ->
-            True
-
-        ( R, R ) ->
-            True
-
-        _ ->
-            False
-
-
-equalTiles : Tile -> Tile -> Bool
-equalTiles t1 t2 =
-    case ( t1, t2 ) of
-        ( Piece B (LL r1 c1) Inc, Piece B (LL r2 c2) Inc ) ->
-            (r1 == r2) && (c1 == c2)
-
-        ( Piece B (LL r1 c1) Dec, Piece B (LL r2 c2) Dec ) ->
-            (r1 == r2) && (c1 == c2)
-
-        ( Piece B (LL r1 c1) Both, Piece B (LL r2 c2) Both ) ->
-            (r1 == r2) && (c1 == c2)
-
-        ( Piece R (LL r1 c1) Inc, Piece R (LL r2 c2) Inc ) ->
-            (r1 == r2) && (c1 == c2)
-
-        ( Piece R (LL r1 c1) Dec, Piece R (LL r2 c2) Dec ) ->
-            (r1 == r2) && (c1 == c2)
-
-        ( Piece R (LL r1 c1) Both, Piece R (LL r2 c2) Both ) ->
-            (r1 == r2) && (c1 == c2)
-
-        _ ->
-            False
 
 
 changeColor : Color -> Color
@@ -90,66 +47,6 @@ newTile color row col =
                  else
                     Dec
                 )
-
-
-newBoard : Int -> Array (Array Tile)
-newBoard i =
-    -- creates an initial board where all the pieces are set up correctly
-    let
-        res =
-            Array.initialize i
-                (\rowInd ->
-                    let
-                        rowEven =
-                            modBy 2 rowInd
-                    in
-                    if rowInd == 3 || rowInd == 4 then
-                        Array.initialize i (\_ -> E)
-
-                    else if rowEven == 0 then
-                        Array.initialize i
-                            (\colInd ->
-                                let
-                                    colEven =
-                                        modBy 2 colInd
-                                in
-                                if rowInd < 3 then
-                                    if colEven == 0 then
-                                        newTile Nothing rowInd colInd
-
-                                    else
-                                        newTile (Just B) rowInd colInd
-
-                                else if colEven == 0 then
-                                    newTile Nothing rowInd colInd
-
-                                else
-                                    newTile (Just R) rowInd colInd
-                            )
-
-                    else
-                        Array.initialize i
-                            (\colInd ->
-                                let
-                                    colEven =
-                                        modBy 2 colInd
-                                in
-                                if rowInd < 3 then
-                                    if colEven == 0 then
-                                        newTile (Just B) rowInd colInd
-
-                                    else
-                                        newTile Nothing rowInd colInd
-
-                                else if colEven == 0 then
-                                    newTile (Just R) rowInd colInd
-
-                                else
-                                    newTile Nothing rowInd colInd
-                            )
-                )
-    in
-    res
 
 
 withinBounds : LogicalLoc -> Bool
@@ -336,8 +233,267 @@ kingMe (LL newRow newCol) t =
                     Piece color (LL newRow newCol) move
 
 
+legalMove : Checkers -> LogicalLoc -> Tile -> Bool
+legalMove c (LL newRow newCol) t =
+    -- Given a board and a new location and the current
+    -- piece that is selected returns if that piece can move
+    case boardRef c (LL newRow newCol) of
+        E ->
+            case t of
+                E ->
+                    False
+
+                Piece _ (LL curRow curCol) move ->
+                    let
+                        cap =
+                            checkCapture c move (LL curRow curCol) (LL newRow newCol)
+
+                        dir =
+                            checkDirection move (LL curRow curCol) (LL newRow newCol)
+
+                        bounds =
+                            withinBounds (LL newRow newCol)
+                    in
+                    if cap == False then
+                        (dir == True) && (bounds == True)
+
+                    else
+                        bounds == True
+
+        _ ->
+            False
+
+
+
+-- get all the tiles of a current player
+
+
+getPlayerTiles : Array (Array Tile) -> Color -> Array Tile
+getPlayerTiles board c =
+    let
+        playerTiles =
+            \row -> Array.filter (\tile -> tileGivenColor tile c) row
+    in
+    Array.foldr (\row output -> Array.append (playerTiles row) output) Array.empty board
+
+
+
+-- return the four potential inc. moves from r, c
+
+
+getIncLL : Int -> Int -> List LogicalLoc
+getIncLL r c =
+    let
+        incLeft =
+            LL (r + 1) (c - 1)
+
+        incRight =
+            LL (r + 1) (c + 1)
+
+        capIncLeft =
+            LL (r + 2) (c - 2)
+
+        capIncRight =
+            LL (r + 2) (c + 2)
+    in
+    [ incLeft, incRight, capIncLeft, capIncRight ]
+
+
+
+-- return the four potential dec. moves from r, c
+
+
+getDecLL : Int -> Int -> List LogicalLoc
+getDecLL r c =
+    let
+        decLeft =
+            LL (r - 1) (c - 1)
+
+        decRight =
+            LL (r - 1) (c + 1)
+
+        capDecLeft =
+            LL (r - 2) (c - 2)
+
+        capDecRight =
+            LL (r - 2) (c + 2)
+    in
+    [ decLeft, decRight, capDecLeft, capDecRight ]
+
+
+
+-- return the 8 potential moves from r, c
+
+
+getBothLL : Int -> Int -> List LogicalLoc
+getBothLL r c =
+    getIncLL r c ++ getDecLL r c
+
+
+
+-- returns whether the tile is of the given color
+
+
+tileGivenColor : Tile -> Color -> Bool
+tileGivenColor t c1 =
+    case t of
+        E ->
+            False
+
+        Piece c2 _ _ ->
+            equalColors c1 c2
+
+
+
+-- taking current board and location of a piece, return valid moves
+
+
+getLegalMoves : Checkers -> Tile -> List ( LogicalLoc, Tile )
+getLegalMoves checkers tile =
+    case tile of
+        E ->
+            []
+
+        Piece _ (LL r c) move ->
+            let
+                llocLegal =
+                    \lloc -> legalMove checkers lloc tile
+
+                addTile =
+                    \lloc -> ( lloc, tile )
+
+                wrapList =
+                    \lst -> List.map addTile (List.filter llocLegal lst)
+            in
+            case move of
+                Inc ->
+                    wrapList (getIncLL r c)
+
+                Dec ->
+                    wrapList (getDecLL r c)
+
+                Both ->
+                    wrapList (getBothLL r c)
+
+
+
+-- given a board, get all legal moves for a player
+
+
+getAllLegalMoves : Checkers -> List ( LogicalLoc, Tile )
+getAllLegalMoves checkers =
+    case checkers of
+        C (Board board _) _ _ currPlayer _ _ ->
+            let
+                tiles =
+                    Array.toList (getPlayerTiles board currPlayer)
+
+                moves =
+                    \tile -> getLegalMoves checkers tile
+            in
+            List.concatMap moves tiles
+
+
 
 {------------------------- Exposed Functions -------------------------}
+
+
+newBoard : Int -> Array (Array Tile)
+newBoard i =
+    -- creates an initial board where all the pieces are set up correctly
+    let
+        res =
+            Array.initialize i
+                (\rowInd ->
+                    let
+                        rowEven =
+                            modBy 2 rowInd
+                    in
+                    if rowInd == 3 || rowInd == 4 then
+                        Array.initialize i (\_ -> E)
+
+                    else if rowEven == 0 then
+                        Array.initialize i
+                            (\colInd ->
+                                let
+                                    colEven =
+                                        modBy 2 colInd
+                                in
+                                if rowInd < 3 then
+                                    if colEven == 0 then
+                                        newTile Nothing rowInd colInd
+
+                                    else
+                                        newTile (Just B) rowInd colInd
+
+                                else if colEven == 0 then
+                                    newTile Nothing rowInd colInd
+
+                                else
+                                    newTile (Just R) rowInd colInd
+                            )
+
+                    else
+                        Array.initialize i
+                            (\colInd ->
+                                let
+                                    colEven =
+                                        modBy 2 colInd
+                                in
+                                if rowInd < 3 then
+                                    if colEven == 0 then
+                                        newTile (Just B) rowInd colInd
+
+                                    else
+                                        newTile Nothing rowInd colInd
+
+                                else if colEven == 0 then
+                                    newTile (Just R) rowInd colInd
+
+                                else
+                                    newTile Nothing rowInd colInd
+                            )
+                )
+    in
+    res
+
+
+equalColors : Color -> Color -> Bool
+equalColors c1 c2 =
+    case ( c1, c2 ) of
+        ( B, B ) ->
+            True
+
+        ( R, R ) ->
+            True
+
+        _ ->
+            False
+
+
+equalTiles : Tile -> Tile -> Bool
+equalTiles t1 t2 =
+    case ( t1, t2 ) of
+        ( Piece B (LL r1 c1) Inc, Piece B (LL r2 c2) Inc ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece B (LL r1 c1) Dec, Piece B (LL r2 c2) Dec ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece B (LL r1 c1) Both, Piece B (LL r2 c2) Both ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece R (LL r1 c1) Inc, Piece R (LL r2 c2) Inc ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece R (LL r1 c1) Dec, Piece R (LL r2 c2) Dec ) ->
+            (r1 == r2) && (c1 == c2)
+
+        ( Piece R (LL r1 c1) Both, Piece R (LL r2 c2) Both ) ->
+            (r1 == r2) && (c1 == c2)
+
+        _ ->
+            False
 
 
 logicalToPhysical : LogicalLoc -> BoardSpec -> PhysicalLoc
@@ -381,37 +537,6 @@ boardRef c (LL row col) =
 
                                 Just t ->
                                     t
-
-
-legalMove : Checkers -> LogicalLoc -> Tile -> Bool
-legalMove c (LL newRow newCol) t =
-    -- Given a board and a new location and the current
-    -- piece that is selected returns if that piece can move
-    case boardRef c (LL newRow newCol) of
-        E ->
-            case t of
-                E ->
-                    False
-
-                Piece _ (LL curRow curCol) move ->
-                    let
-                        cap =
-                            checkCapture c move (LL curRow curCol) (LL newRow newCol)
-
-                        dir =
-                            checkDirection move (LL curRow curCol) (LL newRow newCol)
-
-                        bounds =
-                            withinBounds (LL newRow newCol)
-                    in
-                    if cap == False then
-                        (dir == True) && (bounds == True)
-
-                    else
-                        bounds == True
-
-        _ ->
-            False
 
 
 movePiece : Checkers -> LogicalLoc -> Tile -> Maybe Checkers
@@ -503,136 +628,6 @@ movePiece c (LL newRow newCol) t =
 
 
 
--- returns whether the tile is of the given color
-
-
-tileGivenColor : Tile -> Color -> Bool
-tileGivenColor t c1 =
-    case t of
-        E ->
-            False
-
-        Piece c2 _ _ ->
-            equalColors c1 c2
-
-
-
--- get all the tiles of a current player
-
-
-getPlayerTiles : Array (Array Tile) -> Color -> Array Tile
-getPlayerTiles board c =
-    let
-        playerTiles =
-            \row -> Array.filter (\tile -> tileGivenColor tile c) row
-    in
-    Array.foldr (\row output -> Array.append (playerTiles row) output) Array.empty board
-
-
-
--- return the four potential inc. moves from r, c
-
-
-getIncLL : Int -> Int -> List LogicalLoc
-getIncLL r c =
-    let
-        incLeft =
-            LL (r + 1) (c - 1)
-
-        incRight =
-            LL (r + 1) (c + 1)
-
-        capIncLeft =
-            LL (r + 2) (c - 2)
-
-        capIncRight =
-            LL (r + 2) (c + 2)
-    in
-    [ incLeft, incRight, capIncLeft, capIncRight ]
-
-
-
--- return the four potential dec. moves from r, c
-
-
-getDecLL : Int -> Int -> List LogicalLoc
-getDecLL r c =
-    let
-        decLeft =
-            LL (r - 1) (c - 1)
-
-        decRight =
-            LL (r - 1) (c + 1)
-
-        capDecLeft =
-            LL (r - 2) (c - 2)
-
-        capDecRight =
-            LL (r - 2) (c + 2)
-    in
-    [ decLeft, decRight, capDecLeft, capDecRight ]
-
-
-
--- return the 8 potential moves from r, c
-
-
-getBothLL : Int -> Int -> List LogicalLoc
-getBothLL r c =
-    getIncLL r c ++ getDecLL r c
-
-
-
--- taking current board and location of a piece, return valid moves
-
-
-getLegalMoves : Checkers -> Tile -> List ( LogicalLoc, Tile )
-getLegalMoves checkers tile =
-    case tile of
-        E ->
-            []
-
-        Piece _ (LL r c) move ->
-            let
-                llocLegal =
-                    \lloc -> legalMove checkers lloc tile
-
-                addTile =
-                    \lloc -> ( lloc, tile )
-
-                wrapList =
-                    \lst -> List.map addTile (List.filter llocLegal lst)
-            in
-            case move of
-                Inc ->
-                    wrapList (getIncLL r c)
-
-                Dec ->
-                    wrapList (getDecLL r c)
-
-                Both ->
-                    wrapList (getBothLL r c)
-
-
-
--- given a board, get all legal moves for a player
-
-
-getAllLegalMoves : Checkers -> List ( LogicalLoc, Tile )
-getAllLegalMoves checkers =
-    case checkers of
-        C (Board board _) _ _ currPlayer _ _ ->
-            let
-                tiles =
-                    Array.toList (getPlayerTiles board currPlayer)
-
-                moves =
-                    \tile -> getLegalMoves checkers tile
-            in
-            List.concatMap moves tiles
-
-
-
 -- check that given player is robot
 
 
@@ -703,117 +698,3 @@ endGame checkers =
 
 
 -- no more pieces left
-
-
-testCheckers : Checkers
-testCheckers =
-    -- test game
-    C (Board (newBoard 8) (BS 70 30 10 10)) Nothing Nothing B 0 Nothing
-
-
-
--- test game where one player has no pieces
-
-
-testEndGame : Checkers
-testEndGame =
-    C
-        (Board
-            (Array.fromList
-                [ Array.fromList [ E, Piece R (LL 0 1) Both, E, Piece R (LL 0 3) Both, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, Piece R (LL 2 3) Dec, E, E, E, E ]
-                , Array.fromList [ E, E, Piece R (LL 3 2) Dec, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, E, E, Piece R (LL 7 6) Dec, E ]
-                ]
-            )
-            (BS 70 30 360 98)
-        )
-        Nothing
-        Nothing
-        B
-        0
-        Nothing
-
-
-
--- another test end game where black has no moves
-
-
-testEndGame2 : Checkers
-testEndGame2 =
-    C
-        (Board
-            (Array.fromList
-                [ Array.fromList [ E, Piece R (LL 0 1) Both, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, Piece R (LL 1 2) Dec, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, Piece R (LL 2 5) Dec, E, Piece B (LL 2 7) Inc ]
-                , Array.fromList [ E, E, E, E, E, E, Piece B (LL 3 6) Inc, E ]
-                , Array.fromList [ E, E, E, E, E, Piece R (LL 4 5) Dec, E, Piece R (LL 4 7) Dec ]
-                , Array.fromList [ E, E, E, E, Piece R (LL 5 4) Dec, E, Piece R (LL 5 6) Dec, E ]
-                , Array.fromList [ E, E, E, E, E, Piece R (LL 6 5) Dec, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                ]
-            )
-            (BS 70 30 360 98)
-        )
-        Nothing
-        Nothing
-        B
-        0
-        Nothing
-
-
-testEndGame3 : Checkers
-testEndGame3 =
-    C
-        (Board
-            (Array.fromList
-                [ Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, Piece B (LL 1 4) Both, E, Piece B (LL 1 6) Inc, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, Piece B (LL 5 2) Inc, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, Piece B (LL 6 3) Inc, E, Piece B (LL 6 5) Inc, E, E ]
-                , Array.fromList [ E, E, E, E, Piece B (LL 7 4) Both, E, E, E ]
-                ]
-            )
-            (BS 70 30 360 79)
-        )
-        Nothing
-        Nothing
-        R
-        0
-        Nothing
-
-
-
--- false end game - move for black
-
-
-testEndGameFalse : Checkers
-testEndGameFalse =
-    C
-        (Board
-            (Array.fromList
-                [ Array.fromList [ E, Piece B (LL 0 1) Both, E, Piece R (LL 0 3) Both, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, Piece R (LL 2 3) Dec, E, E, E, E ]
-                , Array.fromList [ E, E, Piece R (LL 3 2) Dec, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ E, E, E, E, E, E, E, E ]
-                , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, E, E, Piece R (LL 7 6) Dec, E ]
-                ]
-            )
-            (BS 70 30 360 98)
-        )
-        Nothing
-        Nothing
-        B
-        0
-        Nothing

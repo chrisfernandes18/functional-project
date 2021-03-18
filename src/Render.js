@@ -5182,11 +5182,6 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Structs$B = {$: 'B'};
-var $author$project$Structs$Human = F2(
-	function (a, b) {
-		return {$: 'Human', a: a, b: b};
-	});
-var $author$project$Structs$R = {$: 'R'};
 var $author$project$Structs$BS = F4(
 	function (a, b, c, d) {
 		return {$: 'BS', a: a, b: b, c: c, d: d};
@@ -5199,6 +5194,11 @@ var $author$project$Structs$C = F6(
 	function (a, b, c, d, e, f) {
 		return {$: 'C', a: a, b: b, c: c, d: d, e: e, f: f};
 	});
+var $author$project$Structs$Human = F2(
+	function (a, b) {
+		return {$: 'Human', a: a, b: b};
+	});
+var $author$project$Structs$R = {$: 'R'};
 var $author$project$Structs$E = {$: 'E'};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Structs$Dec = {$: 'Dec'};
@@ -5267,19 +5267,18 @@ var $author$project$Logic$newBoard = function (i) {
 		});
 	return res;
 };
-var $author$project$Logic$testCheckers = A6(
-	$author$project$Structs$C,
-	A2(
-		$author$project$Structs$Board,
-		$author$project$Logic$newBoard(8),
-		A4($author$project$Structs$BS, 70, 30, 10, 10)),
-	$elm$core$Maybe$Nothing,
-	$elm$core$Maybe$Nothing,
-	$author$project$Structs$B,
-	0,
-	$elm$core$Maybe$Nothing);
 var $author$project$Render$initModel = {
-	checkers: $author$project$Logic$testCheckers,
+	checkers: A6(
+		$author$project$Structs$C,
+		A2(
+			$author$project$Structs$Board,
+			$author$project$Logic$newBoard(8),
+			A4($author$project$Structs$BS, 70, 30, 10, 10)),
+		$elm$core$Maybe$Nothing,
+		$elm$core$Maybe$Nothing,
+		$author$project$Structs$B,
+		0,
+		$elm$core$Maybe$Nothing),
 	gameOver: false,
 	player1: $elm$core$Maybe$Just(
 		A2($author$project$Structs$Human, '', $author$project$Structs$B)),
@@ -6744,7 +6743,7 @@ var $author$project$Logic$movePiece = F3(
 							p1,
 							p2,
 							$author$project$Logic$changeColor(cp),
-							moves,
+							moves + 1,
 							$elm$core$Maybe$Nothing));
 				} else {
 					return $elm$core$Maybe$Just(
@@ -6754,7 +6753,7 @@ var $author$project$Logic$movePiece = F3(
 							p1,
 							p2,
 							$author$project$Logic$changeColor(cp),
-							moves,
+							moves + 1,
 							$elm$core$Maybe$Nothing));
 				}
 			} else {
@@ -7514,14 +7513,15 @@ var $author$project$Render$view = function (model) {
 	var pr = _v3.b;
 	var mx = _v3.c;
 	var my = _v3.d;
-	var p1 = _v1.b;
-	var p2 = _v1.c;
 	var cp = _v1.d;
-	var moves = _v1.e;
 	var ct = _v1.f;
-	var p = _v0.b;
-	var everything = $elm$core$Debug$toString(model);
-	var endText = model.gameOver ? 'Game over' : '';
+	var endText = model.gameOver ? ('Game over: ' + function () {
+		if (cp.$ === 'R') {
+			return 'Black Wins!';
+		} else {
+			return 'Red Wins!';
+		}
+	}()) : 'Checkers';
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -7530,8 +7530,16 @@ var $author$project$Render$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text(everything),
-				$elm$html$Html$text(endText),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'font-size', '50px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(endText)
+					])),
 				A2(
 				$elm$html$Html$div,
 				_List_Nil,

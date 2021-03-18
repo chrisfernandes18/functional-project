@@ -615,10 +615,10 @@ movePiece c (LL newRow newCol) t =
                         board =
                             Array.set takeRow takeBoardCol newBoardFinal
                     in
-                    Just (C (Board board bs) p1 p2 (changeColor cp) moves Nothing)
+                    Just (C (Board board bs) p1 p2 (changeColor cp) (moves + 1) Nothing)
 
                 else
-                    Just (C (Board newBoardFinal bs) p1 p2 (changeColor cp) moves Nothing)
+                    Just (C (Board newBoardFinal bs) p1 p2 (changeColor cp) (moves + 1) Nothing)
 
             _ ->
                 Nothing

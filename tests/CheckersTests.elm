@@ -26,12 +26,9 @@ testCheckers =
     C (Board testBoard testBoardSpec) Nothing Nothing B 0 Nothing
 
 
-
--- test game where one player has no pieces
-
-
 testEndGame : Checkers
 testEndGame =
+    -- test game where one player has no pieces
     C
         (Board
             (Array.fromList
@@ -54,12 +51,9 @@ testEndGame =
         Nothing
 
 
-
--- another test end game where black has no moves
-
-
 testEndGame2 : Checkers
 testEndGame2 =
+    -- another test end game where black has no moves
     C
         (Board
             (Array.fromList
@@ -84,6 +78,7 @@ testEndGame2 =
 
 testEndGame3 : Checkers
 testEndGame3 =
+    -- another test end game where only black pieces left
     C
         (Board
             (Array.fromList
@@ -106,12 +101,9 @@ testEndGame3 =
         Nothing
 
 
-
--- false end game - move for black
-
-
 testEndGameFalse : Checkers
 testEndGameFalse =
+    -- false end game - move for black
     C
         (Board
             (Array.fromList
@@ -136,16 +128,8 @@ testEndGameFalse =
 
 
 {-
-   boardRef
    , checkBot
-   , endGame
-   , equalColors
-   , equalTiles
-   , logicalToPhysical
    , makeBotMove
-   , movePiece
-   , newBoard
-   , physicalToLogical
 -}
 
 
@@ -361,7 +345,7 @@ suite =
                                 Nothing
                                 Nothing
                                 R
-                                0
+                                1
                                 Nothing
                             )
                 in
@@ -420,7 +404,7 @@ suite =
                             Nothing
                             Nothing
                             B
-                            0
+                            2
                             Nothing
 
                     input2 =
@@ -449,7 +433,7 @@ suite =
                                 Nothing
                                 Nothing
                                 R
-                                0
+                                3
                                 Nothing
                             )
                 in
@@ -484,7 +468,7 @@ suite =
                             Nothing
                             Nothing
                             R
-                            0
+                            4
                             Nothing
 
                     input2 =

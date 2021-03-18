@@ -91,7 +91,7 @@ init () =
 
 initModel : Model
 initModel =
-    { checkers = testCheckers
+    { checkers = C (Board (newBoard 8) (BS 70 30 10 10)) Nothing Nothing B 0 Nothing
     , point = { x = 0, y = 0 }
     , gameOver = False
     , player1 = Just (Human "" B)
@@ -276,36 +276,33 @@ boardToHTML b til =
 view : Model -> Html Msg
 view model =
     case ( model.checkers, model.point ) of
-        ( C (Board b (BS cs pr mx my)) _ _ _ _ ct, _ ) ->
+        ( C (Board b (BS cs pr mx my)) _ _ cp _ ct, _ ) ->
             let
-                everything =
-                    Debug.toString model
-
                 endText =
                     if model.gameOver then
-                        "Game over"
+                        "Game over: "
+                            ++ (case cp of
+                                    R ->
+                                        "Black Wins!"
+
+                                    B ->
+                                        "Red Wins!"
+                               )
 
                     else
-                        ""
+                        "Checkers"
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
-                [ Html.text everything
-                , Html.text endText
+                [ Html.div
+                    [ HAttrs.style "font-size" "50px" ]
+                    [ Html.text endText ]
                 , Html.div
                     []
                     [ boardToHTML (Board b (BS cs pr mx my)) ct ]
                 , Html.form
                     [ HAttrs.id "players" ]
                     [ Html.br [] []
-
-                    -- Html.input
-                    --     [ HAttrs.type_ "text", HAttrs.name "player1", HAttrs.placeholder "Player 1" ]
-                    --     []
-                    -- , Html.input
-                    --     [ HAttrs.type_ "text", HAttrs.name "player2", HAttrs.placeholder "Player 2" ]
-                    --     []
-                    -- , Html.br [] []
                     , Html.select
                         [ HAttrs.id "choice1", HEvents.onInput UpdatePlayer1 ]
                         [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
@@ -316,14 +313,6 @@ view model =
                         [ Html.option [ HAttrs.value "human" ] [ Html.text "Human" ]
                         , Html.option [ HAttrs.value "bot" ] [ Html.text "Bot" ]
                         ]
-
-                    -- , Html.br [] []
-                    -- , Html.button
-                    --     [ HEvents.onClick SubmitForm ]
-                    --     [ Html.text "Submit" ]
-                    -- Html.input
-                    --     [ HAttrs.type_ "submit" ]
-                    --     []
                     ]
                 ]
 

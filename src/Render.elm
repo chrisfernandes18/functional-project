@@ -347,6 +347,7 @@ view model =
                                 _ ->
                                     Html.text ""
                             , Html.br [] []
+                            , Html.br [] []
                             , Html.input
                                 [ HAttrs.type_ "button", HAttrs.value "Submit", HEvents.onClick Submit ]
                                 []

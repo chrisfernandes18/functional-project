@@ -23,7 +23,7 @@ testBoard =
 testCheckers : Checkers
 testCheckers =
     -- test game
-    C (Board testBoard testBoardSpec) Nothing Nothing B 0 Nothing
+    C (Board testBoard testBoardSpec) B 0 Nothing
 
 
 testEndGame : Checkers
@@ -42,10 +42,8 @@ testEndGame =
                 , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, E, E, Piece R (LL 7 6) Dec, E ]
                 ]
             )
-            (BS 70 30 360 98)
+            (BS 10 70 30 360 98)
         )
-        Nothing
-        Nothing
         B
         0
         Nothing
@@ -67,10 +65,8 @@ testEndGame2 =
                 , Array.fromList [ E, E, E, E, E, E, E, E ]
                 ]
             )
-            (BS 70 30 360 98)
+            (BS 10 70 30 360 98)
         )
-        Nothing
-        Nothing
         B
         0
         Nothing
@@ -92,10 +88,8 @@ testEndGame3 =
                 , Array.fromList [ E, E, E, E, Piece B (LL 7 4) Both, E, E, E ]
                 ]
             )
-            (BS 70 30 360 79)
+            (BS 10 70 30 360 79)
         )
-        Nothing
-        Nothing
         R
         0
         Nothing
@@ -117,10 +111,8 @@ testEndGameFalse =
                 , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, E, E, Piece R (LL 7 6) Dec, E ]
                 ]
             )
-            (BS 70 30 360 98)
+            (BS 10 70 30 360 98)
         )
-        Nothing
-        Nothing
         B
         0
         Nothing
@@ -340,10 +332,8 @@ suite =
                                         , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
                                         ]
                                     )
-                                    (BS 70 30 10 10)
+                                    (BS 10 70 30 10 10)
                                 )
-                                Nothing
-                                Nothing
                                 R
                                 1
                                 Nothing
@@ -399,10 +389,8 @@ suite =
                                     , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
                                     ]
                                 )
-                                (BS 70 30 493.5 82)
+                                (BS 10 0 30 493.5 82)
                             )
-                            Nothing
-                            Nothing
                             B
                             2
                             Nothing
@@ -428,10 +416,8 @@ suite =
                                         , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
                                         ]
                                     )
-                                    (BS 70 30 493.5 82)
+                                    (BS 10 70 30 493.5 82)
                                 )
-                                Nothing
-                                Nothing
                                 R
                                 3
                                 Nothing
@@ -463,10 +449,8 @@ suite =
                                     , Array.fromList [ Piece R (LL 7 0) Dec, E, Piece R (LL 7 2) Dec, E, Piece R (LL 7 4) Dec, E, Piece R (LL 7 6) Dec, E ]
                                     ]
                                 )
-                                (BS 70 30 493.5 82)
+                                (BS 10 70 30 493.5 82)
                             )
-                            Nothing
-                            Nothing
                             R
                             4
                             Nothing

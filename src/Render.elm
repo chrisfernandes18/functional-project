@@ -43,15 +43,19 @@ type alias Model =
 
 
 type Msg
-    = Click Point
+    = -- Where user clicked
+      Click Point
+      -- Get offset from edge of browser to table tag
     | Offset (List Float)
-      -- | SubmitForm
+      -- Info submitted by user
     | UpdatePlayer1 String
     | UpdatePlayer2 String
     | UpdatePlayer1Name String
     | UpdatePlayer2Name String
     | Submit
+      -- Index for robot to choose from
     | RandomInt Int
+      -- When window size changes
     | Resize
 
 

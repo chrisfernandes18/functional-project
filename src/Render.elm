@@ -52,6 +52,7 @@ type Msg
     | UpdatePlayer2Name String
     | Submit
     | RandomInt Int
+    | Resize
 
 
 type alias Flags =
@@ -617,6 +618,9 @@ update msg model =
                 Submit ->
                     ( { model | init = False }, Cmd.none )
 
+                Resize ->
+                    ( model, requestBoardOffset () )
+
                 _ ->
                     ( model, Cmd.none )
 
@@ -672,4 +676,5 @@ subscriptions _ =
                 )
             )
         , recieveBoardOffset Offset
+        , Browser.Events.onResize (\_ _ -> Resize)
         ]

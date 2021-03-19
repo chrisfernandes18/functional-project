@@ -5352,6 +5352,7 @@ var $author$project$Render$Click = function (a) {
 var $author$project$Render$Offset = function (a) {
 	return {$: 'Offset', a: a};
 };
+var $author$project$Render$Resize = {$: 'Resize'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
@@ -5756,6 +5757,22 @@ var $elm$browser$Browser$Events$on = F3(
 			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
 	});
 var $elm$browser$Browser$Events$onClick = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'click');
+var $elm$browser$Browser$Events$Window = {$: 'Window'};
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$browser$Browser$Events$onResize = function (func) {
+	return A3(
+		$elm$browser$Browser$Events$on,
+		$elm$browser$Browser$Events$Window,
+		'resize',
+		A2(
+			$elm$json$Json$Decode$field,
+			'target',
+			A3(
+				$elm$json$Json$Decode$map2,
+				func,
+				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
+				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
+};
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Render$recieveBoardOffset = _Platform_incomingPort(
 	'recieveBoardOffset',
@@ -5778,7 +5795,12 @@ var $author$project$Render$subscriptions = function (_v0) {
 							}),
 						A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
 						A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float)))),
-				$author$project$Render$recieveBoardOffset($author$project$Render$Offset)
+				$author$project$Render$recieveBoardOffset($author$project$Render$Offset),
+				$elm$browser$Browser$Events$onResize(
+				F2(
+					function (_v1, _v2) {
+						return $author$project$Render$Resize;
+					}))
 			]));
 };
 var $author$project$Structs$PL = F2(
@@ -7347,12 +7369,16 @@ var $author$project$Render$update = F2(
 							player2: A2($author$project$Render$playerName, p2s, model.player2)
 						}) : model,
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'Submit':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{init: false}),
 					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					model,
+					$author$project$Render$requestBoardOffset(_Utils_Tuple0));
 		}
 	});
 var $author$project$Render$Submit = {$: 'Submit'};

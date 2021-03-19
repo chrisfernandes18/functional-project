@@ -5245,9 +5245,6 @@ var $author$project$Structs$Human = F2(
 		return {$: 'Human', a: a, b: b};
 	});
 var $author$project$Structs$R = {$: 'R'};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $author$project$Structs$E = {$: 'E'};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Structs$Dec = {$: 'Dec'};
@@ -5327,14 +5324,13 @@ var $author$project$Render$initModel = {
 		0,
 		$elm$core$Maybe$Nothing),
 	gameOver: false,
-	index: -1,
+	index: 0,
 	init: true,
 	player1: $elm$core$Maybe$Just(
 		A2($author$project$Structs$Human, 'Player 1', $author$project$Structs$B)),
 	player2: $elm$core$Maybe$Just(
 		A2($author$project$Structs$Human, 'Player 2', $author$project$Structs$R)),
-	point: {x: 0, y: 0},
-	time: 0.0
+	point: {x: 0, y: 0}
 };
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $author$project$Render$requestBoardOffset = _Platform_outgoingPort(
@@ -5350,9 +5346,7 @@ var $author$project$Render$init = function (_v0) {
 var $author$project$Render$Click = function (a) {
 	return {$: 'Click', a: a};
 };
-var $author$project$Render$MoveBot = function (a) {
-	return {$: 'MoveBot', a: a};
-};
+var $author$project$Render$MoveBot = {$: 'MoveBot'};
 var $author$project$Render$Noop = {$: 'Noop'};
 var $author$project$Render$Offset = function (a) {
 	return {$: 'Offset', a: a};
@@ -5940,7 +5934,7 @@ var $author$project$Render$subscriptions = function (_v0) {
 					})),
 				$elm$browser$Browser$Events$onAnimationFrameDelta(
 				function (time) {
-					return ((time - 5.0) > 1.0) ? $author$project$Render$MoveBot(time) : $author$project$Render$Noop;
+					return ((time - 5.0) > 1.0) ? $author$project$Render$MoveBot : $author$project$Render$Noop;
 				})
 			]));
 };
@@ -6893,6 +6887,9 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $elm$core$Bitwise$xor = _Bitwise_xor;
 var $elm$random$Random$peel = function (_v0) {
 	var state = _v0.a;
@@ -7400,7 +7397,6 @@ var $author$project$Render$update = F2(
 		while (true) {
 			switch (msg.$) {
 				case 'MoveBot':
-					var time = msg.a;
 					return _Utils_Tuple2(
 						function () {
 							if (model.init) {
@@ -7408,9 +7404,7 @@ var $author$project$Render$update = F2(
 							} else {
 								var newModel = $author$project$Render$gameEnded(
 									A2($author$project$Render$updateBotMove, model, model.index));
-								return _Utils_update(
-									newModel,
-									{time: time});
+								return newModel;
 							}
 						}(),
 						generateInt);
@@ -7945,7 +7939,6 @@ var $author$project$Render$view = function (model) {
 	var cp = _v1.b;
 	var moves = _v1.c;
 	var ct = _v1.d;
-	var every = $elm$core$Debug$toString(model);
 	var endText = model.gameOver ? ('Game over: ' + function () {
 		if (cp.$ === 'R') {
 			return 'Black Wins!';
@@ -7961,7 +7954,6 @@ var $author$project$Render$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$elm$html$Html$text(every),
 				A2(
 				$elm$html$Html$h1,
 				_List_fromArray(

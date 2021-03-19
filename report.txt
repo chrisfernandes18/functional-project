@@ -1,3 +1,5 @@
+Github Link: https://github.com/chrisfernandes18/functional-project
+
 For this project we decided on doing checkers in the end. We first tried to implement
 Pac-Man but we really struggled with trying to get the visualization of Pac-Man
 in the web so we decided to go with checkers since it was much simpler to deal with 

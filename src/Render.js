@@ -5333,7 +5333,8 @@ var $author$project$Render$initModel = {
 		A2($author$project$Structs$Human, 'Player 1', $author$project$Structs$B)),
 	player2: $elm$core$Maybe$Just(
 		A2($author$project$Structs$Human, 'Player 2', $author$project$Structs$R)),
-	point: {x: 0, y: 0}
+	point: {x: 0, y: 0},
+	time: 0.0
 };
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $author$project$Render$requestBoardOffset = _Platform_outgoingPort(
@@ -5349,6 +5350,10 @@ var $author$project$Render$init = function (_v0) {
 var $author$project$Render$Click = function (a) {
 	return {$: 'Click', a: a};
 };
+var $author$project$Render$MoveBot = function (a) {
+	return {$: 'MoveBot', a: a};
+};
+var $author$project$Render$Noop = {$: 'Noop'};
 var $author$project$Render$Offset = function (a) {
 	return {$: 'Offset', a: a};
 };
@@ -5356,6 +5361,140 @@ var $author$project$Render$Resize = {$: 'Resize'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $elm$browser$Browser$AnimationManager$Delta = function (a) {
+	return {$: 'Delta', a: a};
+};
+var $elm$browser$Browser$AnimationManager$State = F3(
+	function (subs, request, oldTime) {
+		return {oldTime: oldTime, request: request, subs: subs};
+	});
+var $elm$browser$Browser$AnimationManager$init = $elm$core$Task$succeed(
+	A3($elm$browser$Browser$AnimationManager$State, _List_Nil, $elm$core$Maybe$Nothing, 0));
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$browser$Browser$AnimationManager$now = _Browser_now(_Utils_Tuple0);
+var $elm$browser$Browser$AnimationManager$rAF = _Browser_rAF(_Utils_Tuple0);
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$browser$Browser$AnimationManager$onEffects = F3(
+	function (router, subs, _v0) {
+		var request = _v0.request;
+		var oldTime = _v0.oldTime;
+		var _v1 = _Utils_Tuple2(request, subs);
+		if (_v1.a.$ === 'Nothing') {
+			if (!_v1.b.b) {
+				var _v2 = _v1.a;
+				return $elm$browser$Browser$AnimationManager$init;
+			} else {
+				var _v4 = _v1.a;
+				return A2(
+					$elm$core$Task$andThen,
+					function (pid) {
+						return A2(
+							$elm$core$Task$andThen,
+							function (time) {
+								return $elm$core$Task$succeed(
+									A3(
+										$elm$browser$Browser$AnimationManager$State,
+										subs,
+										$elm$core$Maybe$Just(pid),
+										time));
+							},
+							$elm$browser$Browser$AnimationManager$now);
+					},
+					$elm$core$Process$spawn(
+						A2(
+							$elm$core$Task$andThen,
+							$elm$core$Platform$sendToSelf(router),
+							$elm$browser$Browser$AnimationManager$rAF)));
+			}
+		} else {
+			if (!_v1.b.b) {
+				var pid = _v1.a.a;
+				return A2(
+					$elm$core$Task$andThen,
+					function (_v3) {
+						return $elm$browser$Browser$AnimationManager$init;
+					},
+					$elm$core$Process$kill(pid));
+			} else {
+				return $elm$core$Task$succeed(
+					A3($elm$browser$Browser$AnimationManager$State, subs, request, oldTime));
+			}
+		}
+	});
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$browser$Browser$AnimationManager$onSelfMsg = F3(
+	function (router, newTime, _v0) {
+		var subs = _v0.subs;
+		var oldTime = _v0.oldTime;
+		var send = function (sub) {
+			if (sub.$ === 'Time') {
+				var tagger = sub.a;
+				return A2(
+					$elm$core$Platform$sendToApp,
+					router,
+					tagger(
+						$elm$time$Time$millisToPosix(newTime)));
+			} else {
+				var tagger = sub.a;
+				return A2(
+					$elm$core$Platform$sendToApp,
+					router,
+					tagger(newTime - oldTime));
+			}
+		};
+		return A2(
+			$elm$core$Task$andThen,
+			function (pid) {
+				return A2(
+					$elm$core$Task$andThen,
+					function (_v1) {
+						return $elm$core$Task$succeed(
+							A3(
+								$elm$browser$Browser$AnimationManager$State,
+								subs,
+								$elm$core$Maybe$Just(pid),
+								newTime));
+					},
+					$elm$core$Task$sequence(
+						A2($elm$core$List$map, send, subs)));
+			},
+			$elm$core$Process$spawn(
+				A2(
+					$elm$core$Task$andThen,
+					$elm$core$Platform$sendToSelf(router),
+					$elm$browser$Browser$AnimationManager$rAF)));
+	});
+var $elm$browser$Browser$AnimationManager$Time = function (a) {
+	return {$: 'Time', a: a};
+};
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$browser$Browser$AnimationManager$subMap = F2(
+	function (func, sub) {
+		if (sub.$ === 'Time') {
+			var tagger = sub.a;
+			return $elm$browser$Browser$AnimationManager$Time(
+				A2($elm$core$Basics$composeL, func, tagger));
+		} else {
+			var tagger = sub.a;
+			return $elm$browser$Browser$AnimationManager$Delta(
+				A2($elm$core$Basics$composeL, func, tagger));
+		}
+	});
+_Platform_effectManagers['Browser.AnimationManager'] = _Platform_createManager($elm$browser$Browser$AnimationManager$init, $elm$browser$Browser$AnimationManager$onEffects, $elm$browser$Browser$AnimationManager$onSelfMsg, 0, $elm$browser$Browser$AnimationManager$subMap);
+var $elm$browser$Browser$AnimationManager$subscription = _Platform_leaf('Browser.AnimationManager');
+var $elm$browser$Browser$AnimationManager$onAnimationFrameDelta = function (tagger) {
+	return $elm$browser$Browser$AnimationManager$subscription(
+		$elm$browser$Browser$AnimationManager$Delta(tagger));
+};
+var $elm$browser$Browser$Events$onAnimationFrameDelta = $elm$browser$Browser$AnimationManager$onAnimationFrameDelta;
 var $elm$browser$Browser$Events$Document = {$: 'Document'};
 var $elm$browser$Browser$Events$MySub = F3(
 	function (a, b, c) {
@@ -5506,7 +5645,6 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
-var $elm$core$Process$kill = _Scheduler_kill;
 var $elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
 		foldl:
@@ -5597,7 +5735,6 @@ var $elm$browser$Browser$Events$Event = F2(
 	function (key, event) {
 		return {event: event, key: key};
 	});
-var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var $elm$browser$Browser$Events$spawn = F3(
 	function (router, key, _v0) {
 		var node = _v0.a;
@@ -5800,7 +5937,11 @@ var $author$project$Render$subscriptions = function (_v0) {
 				F2(
 					function (_v1, _v2) {
 						return $author$project$Render$Resize;
-					}))
+					})),
+				$elm$browser$Browser$Events$onAnimationFrameDelta(
+				function (time) {
+					return ((time - 5.0) > 1.0) ? $author$project$Render$MoveBot(time) : $author$project$Render$Noop;
+				})
 			]));
 };
 var $author$project$Structs$PL = F2(
@@ -6682,10 +6823,6 @@ var $elm$time$Time$Zone = F2(
 		return {$: 'Zone', a: a, b: b};
 	});
 var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
 var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
 var $elm$time$Time$posixToMillis = function (_v0) {
 	var millis = _v0.a;
@@ -7259,62 +7396,51 @@ var $author$project$Render$update = F2(
 			$elm$random$Random$generate,
 			$author$project$Render$RandomInt,
 			A2($elm$random$Random$int, 0, listLen - 1));
-		switch (msg.$) {
-			case 'RandomInt':
-				var num = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{index: num}),
-					$elm$core$Platform$Cmd$none);
-			case 'Click':
-				var pNew = msg.a;
-				var pl = A2(
-					$author$project$Logic$physicalToLogical,
-					A2($author$project$Structs$PL, pNew.x, pNew.y),
-					A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld));
-				var newTile = A2(
-					$author$project$Logic$boardRef,
-					A4(
-						$author$project$Structs$C,
-						A2(
-							$author$project$Structs$Board,
-							b,
-							A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
-						cp,
-						moves,
-						ct),
-					pl);
-				var curTile = $author$project$Render$unwrapTile(ct);
-				return A2($author$project$Logic$equalTiles, newTile, curTile) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							checkers: A4(
-								$author$project$Structs$C,
-								A2(
-									$author$project$Structs$Board,
-									b,
-									A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
-								cp,
-								moves,
-								$elm$core$Maybe$Nothing),
-							point: pNew
-						}),
-					generateInt) : _Utils_Tuple2(
-					model.init ? model : $author$project$Render$gameEnded(
-						A2(
-							$author$project$Render$updateBotMove,
-							A3($author$project$Render$moveTo, newTile, model, msg),
-							model.index)),
-					generateInt);
-			case 'Offset':
-				if (msg.a.b && msg.a.b.b) {
-					var _v5 = msg.a;
-					var x = _v5.a;
-					var _v6 = _v5.b;
-					var y = _v6.a;
+		_v4$10:
+		while (true) {
+			switch (msg.$) {
+				case 'MoveBot':
+					var time = msg.a;
 					return _Utils_Tuple2(
+						function () {
+							if (model.init) {
+								return model;
+							} else {
+								var newModel = $author$project$Render$gameEnded(
+									A2($author$project$Render$updateBotMove, model, model.index));
+								return _Utils_update(
+									newModel,
+									{time: time});
+							}
+						}(),
+						generateInt);
+				case 'RandomInt':
+					var num = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{index: num}),
+						$elm$core$Platform$Cmd$none);
+				case 'Click':
+					var pNew = msg.a;
+					var pl = A2(
+						$author$project$Logic$physicalToLogical,
+						A2($author$project$Structs$PL, pNew.x, pNew.y),
+						A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld));
+					var newTile = A2(
+						$author$project$Logic$boardRef,
+						A4(
+							$author$project$Structs$C,
+							A2(
+								$author$project$Structs$Board,
+								b,
+								A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
+							cp,
+							moves,
+							ct),
+						pl);
+					var curTile = $author$project$Render$unwrapTile(ct);
+					return A2($author$project$Logic$equalTiles, newTile, curTile) ? _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
@@ -7323,63 +7449,92 @@ var $author$project$Render$update = F2(
 									A2(
 										$author$project$Structs$Board,
 										b,
-										A5($author$project$Structs$BS, bords, cs, pr, x, y)),
+										A5($author$project$Structs$BS, bords, cs, pr, xOld, yOld)),
 									cp,
 									moves,
-									ct),
-								point: p
+									$elm$core$Maybe$Nothing),
+								point: pNew
 							}),
+						generateInt) : _Utils_Tuple2(
+						model.init ? model : $author$project$Render$gameEnded(
+							A3($author$project$Render$moveTo, newTile, model, msg)),
+						generateInt);
+				case 'Offset':
+					if (msg.a.b && msg.a.b.b) {
+						var _v5 = msg.a;
+						var x = _v5.a;
+						var _v6 = _v5.b;
+						var y = _v6.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									checkers: A4(
+										$author$project$Structs$C,
+										A2(
+											$author$project$Structs$Board,
+											b,
+											A5($author$project$Structs$BS, bords, cs, pr, x, y)),
+										cp,
+										moves,
+										ct),
+									point: p
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						break _v4$10;
+					}
+				case 'UpdatePlayer1':
+					var p1s = msg.a;
+					return _Utils_Tuple2(
+						model.init ? _Utils_update(
+							model,
+							{
+								player1: A3($author$project$Render$playerStrToP, p1s, '', 1)
+							}) : model,
 						$elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				}
-			case 'UpdatePlayer1':
-				var p1s = msg.a;
-				return _Utils_Tuple2(
-					model.init ? _Utils_update(
+				case 'UpdatePlayer2':
+					var p2s = msg.a;
+					return _Utils_Tuple2(
+						model.init ? _Utils_update(
+							model,
+							{
+								player2: A3($author$project$Render$playerStrToP, p2s, '', 2)
+							}) : model,
+						$elm$core$Platform$Cmd$none);
+				case 'UpdatePlayer1Name':
+					var p1s = msg.a;
+					return _Utils_Tuple2(
+						model.init ? _Utils_update(
+							model,
+							{
+								player1: A2($author$project$Render$playerName, p1s, model.player1)
+							}) : model,
+						$elm$core$Platform$Cmd$none);
+				case 'UpdatePlayer2Name':
+					var p2s = msg.a;
+					return _Utils_Tuple2(
+						model.init ? _Utils_update(
+							model,
+							{
+								player2: A2($author$project$Render$playerName, p2s, model.player2)
+							}) : model,
+						$elm$core$Platform$Cmd$none);
+				case 'Submit':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{init: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'Resize':
+					return _Utils_Tuple2(
 						model,
-						{
-							player1: A3($author$project$Render$playerStrToP, p1s, '', 1)
-						}) : model,
-					$elm$core$Platform$Cmd$none);
-			case 'UpdatePlayer2':
-				var p2s = msg.a;
-				return _Utils_Tuple2(
-					model.init ? _Utils_update(
-						model,
-						{
-							player2: A3($author$project$Render$playerStrToP, p2s, '', 2)
-						}) : model,
-					$elm$core$Platform$Cmd$none);
-			case 'UpdatePlayer1Name':
-				var p1s = msg.a;
-				return _Utils_Tuple2(
-					model.init ? _Utils_update(
-						model,
-						{
-							player1: A2($author$project$Render$playerName, p1s, model.player1)
-						}) : model,
-					$elm$core$Platform$Cmd$none);
-			case 'UpdatePlayer2Name':
-				var p2s = msg.a;
-				return _Utils_Tuple2(
-					model.init ? _Utils_update(
-						model,
-						{
-							player2: A2($author$project$Render$playerName, p2s, model.player2)
-						}) : model,
-					$elm$core$Platform$Cmd$none);
-			case 'Submit':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{init: false}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(
-					model,
-					$author$project$Render$requestBoardOffset(_Utils_Tuple0));
+						$author$project$Render$requestBoardOffset(_Utils_Tuple0));
+				default:
+					break _v4$10;
+			}
 		}
+		return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 	});
 var $author$project$Render$Submit = {$: 'Submit'};
 var $author$project$Render$UpdatePlayer1 = function (a) {
@@ -7790,6 +7945,7 @@ var $author$project$Render$view = function (model) {
 	var cp = _v1.b;
 	var moves = _v1.c;
 	var ct = _v1.d;
+	var every = $elm$core$Debug$toString(model);
 	var endText = model.gameOver ? ('Game over: ' + function () {
 		if (cp.$ === 'R') {
 			return 'Black Wins!';
@@ -7805,6 +7961,7 @@ var $author$project$Render$view = function (model) {
 			]),
 		_List_fromArray(
 			[
+				$elm$html$Html$text(every),
 				A2(
 				$elm$html$Html$h1,
 				_List_fromArray(

@@ -57,6 +57,9 @@ type Msg
     | RandomInt Int
       -- When window size changes
     | Resize
+      --After x amount of time move bot
+    | MoveBot
+    | Noop
 
 
 type alias Flags =
@@ -109,7 +112,7 @@ initModel =
     , player1 = Just (Human "Player 1" B)
     , player2 = Just (Human "Player 2" R)
     , init = True
-    , index = -1
+    , index = 0
     }
 
 
@@ -543,6 +546,19 @@ update msg model =
                     Random.generate RandomInt (Random.int 0 (listLen - 1))
             in
             case msg of
+                MoveBot ->
+                    ( if model.init then
+                        model
+
+                      else
+                        let
+                            newModel =
+                                gameEnded (updateBotMove model model.index)
+                        in
+                        newModel
+                    , generateInt
+                    )
+
                 RandomInt num ->
                     ( { model | index = num }, Cmd.none )
 
@@ -570,7 +586,7 @@ update msg model =
                             model
 
                           else
-                            gameEnded (updateBotMove (moveTo newTile model msg) model.index)
+                            gameEnded (moveTo newTile model msg)
                         , generateInt
                         )
 
@@ -681,4 +697,12 @@ subscriptions _ =
             )
         , recieveBoardOffset Offset
         , Browser.Events.onResize (\_ _ -> Resize)
+        , Browser.Events.onAnimationFrameDelta
+            (\time ->
+                if (time - 5.0) > 1.0 then
+                    MoveBot
+
+                else
+                    Noop
+            )
         ]

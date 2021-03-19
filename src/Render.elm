@@ -12,6 +12,7 @@ import Html.Events as HEvents
 import Http exposing (..)
 import Json.Decode as Decode
 import Logic exposing (..)
+import Random
 import Structs exposing (..)
 import Svg exposing (..)
 import Svg.Attributes as SAttrs
@@ -37,6 +38,7 @@ type alias Model =
     , player1 : Maybe Player
     , player2 : Maybe Player
     , init : Bool
+    , index : Int
     }
 
 
@@ -49,6 +51,7 @@ type Msg
     | UpdatePlayer1Name String
     | UpdatePlayer2Name String
     | Submit
+    | RandomInt Int
 
 
 type alias Flags =
@@ -101,6 +104,7 @@ initModel =
     , player1 = Just (Human "Player 1" B)
     , player2 = Just (Human "Player 2" R)
     , init = True
+    , index = -1
     }
 
 
@@ -302,7 +306,9 @@ view model =
             in
             Html.div
                 [ HAttrs.style "text-align" "center" ]
-                [ {- Html.text every, -}
+                [ {- Html.text every
+                     ,
+                  -}
                   Html.h1
                     [ HAttrs.style "font-size" "50px" ]
                     [ Html.text endText ]
@@ -479,12 +485,12 @@ moveTo nt model msg =
 -- check whether we need to make a bot move
 
 
-updateBotMove : Model -> Model
-updateBotMove model =
+updateBotMove : Model -> Int -> Model
+updateBotMove model ind =
     case model.checkers of
         C _ B _ _ ->
             if checkBot model.player1 then
-                case makeBotMove model.checkers of
+                case makeBotMove model.checkers ind of
                     Nothing ->
                         model
 
@@ -496,7 +502,7 @@ updateBotMove model =
 
         C _ R _ _ ->
             if checkBot model.player2 then
-                case makeBotMove model.checkers of
+                case makeBotMove model.checkers ind of
                     Nothing ->
                         model
 
@@ -524,7 +530,17 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model.checkers, model.point ) of
         ( C (Board b (BS bords cs pr xOld yOld)) cp moves ct, p ) ->
+            let
+                listLen =
+                    List.length (getAllLegalMoves model.checkers)
+
+                generateInt =
+                    Random.generate RandomInt (Random.int 0 (listLen - 1))
+            in
             case msg of
+                RandomInt num ->
+                    ( { model | index = num }, Cmd.none )
+
                 Click pNew ->
                     let
                         pl =
@@ -541,7 +557,7 @@ update msg model =
                             | checkers = C (Board b (BS bords cs pr xOld yOld)) cp moves Nothing
                             , point = pNew
                           }
-                        , Cmd.none
+                        , generateInt
                         )
 
                     else
@@ -549,8 +565,8 @@ update msg model =
                             model
 
                           else
-                            gameEnded (updateBotMove (moveTo newTile model msg))
-                        , Cmd.none
+                            gameEnded (updateBotMove (moveTo newTile model msg) model.index)
+                        , generateInt
                         )
 
                 -- update if game ended after move

@@ -4,6 +4,7 @@ module Logic exposing
     , endGame
     , equalColors
     , equalTiles
+    , getAllLegalMoves
     , logicalToPhysical
     , makeBotMove
     , movePiece
@@ -645,14 +646,17 @@ checkBot p =
 -- given a board, select make a random move
 
 
-makeBotMove : Checkers -> Maybe Checkers
-makeBotMove checkers =
+makeBotMove : Checkers -> Int -> Maybe Checkers
+makeBotMove checkers ind =
     let
         legalMoves =
             getAllLegalMoves checkers
 
+        arrayLst =
+            Array.fromList legalMoves
+
         ( randomLLoc, randomTile ) =
-            case List.head legalMoves of
+            case Array.get ind arrayLst of
                 -- just pick first move for now
                 Just ( l, t ) ->
                     ( l, t )

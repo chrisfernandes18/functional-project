@@ -4392,6 +4392,52 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
+
+
+
+function _Time_now(millisToPosix)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});
+
+function _Time_here()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
+
+
+function _Time_getZoneName()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
+}
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5199,6 +5245,9 @@ var $author$project$Structs$Human = F2(
 		return {$: 'Human', a: a, b: b};
 	});
 var $author$project$Structs$R = {$: 'R'};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $author$project$Structs$E = {$: 'E'};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Structs$Dec = {$: 'Dec'};
@@ -5278,6 +5327,7 @@ var $author$project$Render$initModel = {
 		0,
 		$elm$core$Maybe$Nothing),
 	gameOver: false,
+	index: -1,
 	init: true,
 	player1: $elm$core$Maybe$Just(
 		A2($author$project$Structs$Human, 'Player 1', $author$project$Structs$B)),
@@ -5735,6 +5785,9 @@ var $author$project$Structs$PL = F2(
 	function (a, b) {
 		return {$: 'PL', a: a, b: b};
 	});
+var $author$project$Render$RandomInt = function (a) {
+	return {$: 'RandomInt', a: a};
+};
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -6575,6 +6628,150 @@ var $author$project$Render$gameEnded = function (model) {
 		model,
 		{gameOver: true}) : model;
 };
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
 var $author$project$Logic$changeColor = function (col) {
 	if (col.$ === 'B') {
 		return $author$project$Structs$R;
@@ -6952,78 +7149,72 @@ var $author$project$Logic$checkBot = function (p) {
 		return false;
 	}
 };
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Logic$makeBotMove = function (checkers) {
-	var legalMoves = $author$project$Logic$getAllLegalMoves(checkers);
-	var _v0 = function () {
-		var _v1 = $elm$core$List$head(legalMoves);
-		if (_v1.$ === 'Just') {
-			var _v2 = _v1.a;
-			var l = _v2.a;
-			var t = _v2.b;
-			return _Utils_Tuple2(l, t);
-		} else {
-			return _Utils_Tuple2(
-				A2($author$project$Structs$LL, 0, 0),
-				$author$project$Structs$E);
-		}
-	}();
-	var randomLLoc = _v0.a;
-	var randomTile = _v0.b;
-	if ($elm$core$List$isEmpty(legalMoves)) {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		if (checkers.b.$ === 'B') {
-			var _v4 = checkers.b;
-			return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
-		} else {
-			var _v5 = checkers.b;
-			return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
-		}
-	}
-};
-var $author$project$Render$updateBotMove = function (model) {
-	var _v0 = model.checkers;
-	if (_v0.b.$ === 'B') {
-		var _v1 = _v0.b;
-		if ($author$project$Logic$checkBot(model.player1)) {
-			var _v2 = $author$project$Logic$makeBotMove(model.checkers);
-			if (_v2.$ === 'Nothing') {
-				return model;
+var $author$project$Logic$makeBotMove = F2(
+	function (checkers, ind) {
+		var legalMoves = $author$project$Logic$getAllLegalMoves(checkers);
+		var arrayLst = $elm$core$Array$fromList(legalMoves);
+		var _v0 = function () {
+			var _v1 = A2($elm$core$Array$get, ind, arrayLst);
+			if (_v1.$ === 'Just') {
+				var _v2 = _v1.a;
+				var l = _v2.a;
+				var t = _v2.b;
+				return _Utils_Tuple2(l, t);
 			} else {
-				var c = _v2.a;
-				return _Utils_update(
-					model,
-					{checkers: c});
+				return _Utils_Tuple2(
+					A2($author$project$Structs$LL, 0, 0),
+					$author$project$Structs$E);
+			}
+		}();
+		var randomLLoc = _v0.a;
+		var randomTile = _v0.b;
+		if ($elm$core$List$isEmpty(legalMoves)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			if (checkers.b.$ === 'B') {
+				var _v4 = checkers.b;
+				return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
+			} else {
+				var _v5 = checkers.b;
+				return A3($author$project$Logic$movePiece, checkers, randomLLoc, randomTile);
+			}
+		}
+	});
+var $author$project$Render$updateBotMove = F2(
+	function (model, ind) {
+		var _v0 = model.checkers;
+		if (_v0.b.$ === 'B') {
+			var _v1 = _v0.b;
+			if ($author$project$Logic$checkBot(model.player1)) {
+				var _v2 = A2($author$project$Logic$makeBotMove, model.checkers, ind);
+				if (_v2.$ === 'Nothing') {
+					return model;
+				} else {
+					var c = _v2.a;
+					return _Utils_update(
+						model,
+						{checkers: c});
+				}
+			} else {
+				return model;
 			}
 		} else {
-			return model;
-		}
-	} else {
-		var _v3 = _v0.b;
-		if ($author$project$Logic$checkBot(model.player2)) {
-			var _v4 = $author$project$Logic$makeBotMove(model.checkers);
-			if (_v4.$ === 'Nothing') {
-				return model;
+			var _v3 = _v0.b;
+			if ($author$project$Logic$checkBot(model.player2)) {
+				var _v4 = A2($author$project$Logic$makeBotMove, model.checkers, ind);
+				if (_v4.$ === 'Nothing') {
+					return model;
+				} else {
+					var c = _v4.a;
+					return _Utils_update(
+						model,
+						{checkers: c});
+				}
 			} else {
-				var c = _v4.a;
-				return _Utils_update(
-					model,
-					{checkers: c});
+				return model;
 			}
-		} else {
-			return model;
 		}
-	}
-};
+	});
 var $author$project$Render$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(model.checkers, model.point);
@@ -7040,7 +7231,20 @@ var $author$project$Render$update = F2(
 		var moves = _v1.c;
 		var ct = _v1.d;
 		var p = _v0.b;
+		var listLen = $elm$core$List$length(
+			$author$project$Logic$getAllLegalMoves(model.checkers));
+		var generateInt = A2(
+			$elm$random$Random$generate,
+			$author$project$Render$RandomInt,
+			A2($elm$random$Random$int, 0, listLen - 1));
 		switch (msg.$) {
+			case 'RandomInt':
+				var num = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{index: num}),
+					$elm$core$Platform$Cmd$none);
 			case 'Click':
 				var pNew = msg.a;
 				var pl = A2(
@@ -7075,11 +7279,13 @@ var $author$project$Render$update = F2(
 								$elm$core$Maybe$Nothing),
 							point: pNew
 						}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+					generateInt) : _Utils_Tuple2(
 					model.init ? model : $author$project$Render$gameEnded(
-						$author$project$Render$updateBotMove(
-							A3($author$project$Render$moveTo, newTile, model, msg))),
-					$elm$core$Platform$Cmd$none);
+						A2(
+							$author$project$Render$updateBotMove,
+							A3($author$project$Render$moveTo, newTile, model, msg),
+							model.index)),
+					generateInt);
 			case 'Offset':
 				if (msg.a.b && msg.a.b.b) {
 					var _v5 = msg.a;
